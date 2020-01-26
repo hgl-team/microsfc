@@ -43,7 +43,7 @@ public:
 
 	StoredActionTest() {
 		state = { 0, false, false };
-		action = StoredAction(&container, &state, 0);
+		action = StoredAction(&state, &container, 0);
 		action.setListeners( { this, 1 });
 	}
 };

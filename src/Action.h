@@ -30,8 +30,7 @@ protected:
 	virtual bool evaluateActivation(const sfc::predicate_state_t &state) = 0;
 public:
 	Action();
-	Action(StepContext *context, stateful_state_t *state,
-			const size_t &step_id);
+	Action(stateful_state_t * state, StepContext *context, const size_t &step_id);
 	virtual ~Action();
 	activation_predicate_fnc getCondition() const;
 	void setCondition(activation_predicate_fnc condition);

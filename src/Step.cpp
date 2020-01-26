@@ -13,7 +13,7 @@ Step::Step() : StatefulObject() {
 	this->entry_point = false;
 }
 
-Step::Step(stateful_state_t *state, bool entry_point) :
+Step::Step(stateful_state_t * state, bool entry_point) :
 		StatefulObject(state) {
 	this->entry_point = entry_point;
 }

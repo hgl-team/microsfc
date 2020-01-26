@@ -17,8 +17,7 @@ private:
 	bool should_activate = false;
 public:
 	StoredAction();
-	StoredAction(StepContext *context, stateful_state_t *state,
-			const size_t &step_id);
+	StoredAction(stateful_state_t *state, StepContext *context, const size_t &step_id);
 	virtual ~StoredAction();
 
 protected:

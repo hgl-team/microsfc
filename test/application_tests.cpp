@@ -21,24 +21,22 @@ stateful_state_t step_states[] = {
 		{ 0, false, false },
 };
 Step steps[3] = {
-		Step(step_states, true),
-		Step(step_states + 1, true),
-		Step(step_states + 2, true)
+		Step(&(step_states[0]), true),
+		Step(&(step_states[1]), true),
+		Step(&(step_states[2]), true)
 };
 
 class ApplicationTest : public testing::Test {
 public:
 	stateful_state_t application_state = { 0, false, false };
+	state_context_t state_context = {
+			{step_states, 3}, {NULL, 0}, {NULL, 0}
+	};
 
 	component_context_t component_context = {
 			array<Step> { steps, 3 },
 			array<Action> { NULL, 0 },
 			array<Transition> { NULL, 0 },
-	};
-	state_context_t state_context = {
-			array<stateful_state_t> { step_states, 3 },
-			array<stateful_state_t> { NULL, 0 },
-			array<predicate_fnc> { NULL, 0 }
 	};
 	Application application;
 

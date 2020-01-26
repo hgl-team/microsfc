@@ -9,9 +9,8 @@
 
 namespace sfc {
 
-NonStoredAction::NonStoredAction(StepContext *context,
-		stateful_state_t *state, const size_t &step_id) :
-		Action(context, state, step_id) {
+NonStoredAction::NonStoredAction(stateful_state_t *state, StepContext *context, const size_t &step_id) :
+		Action(state, context, step_id) {
 }
 
 NonStoredAction::~NonStoredAction() {

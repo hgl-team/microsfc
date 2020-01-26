@@ -37,7 +37,7 @@ public:
 
 	NonStoredActionTest() {
 		state = { 0, false, false };
-		action = NonStoredAction(&container, &state, 0);
+		action = NonStoredAction(&state, &container, 0);
 		action.setListeners( { this, 1 });
 	}
 };

@@ -12,7 +12,12 @@ namespace sfc {
 StatefulObject::~StatefulObject() {
 }
 
-StatefulObject::StatefulObject(stateful_state_t *state) {
+StatefulObject::StatefulObject() {
+	this->state = state;
+	this->listeners = { NULL, 0 };
+}
+
+StatefulObject::StatefulObject(stateful_state_t * state) {
 	this->state = state;
 	this->listeners = { NULL, 0 };
 }
@@ -63,13 +68,8 @@ void StatefulObject::setListeners(const array<EventListener> &listeners) {
 	this->listeners = listeners;
 }
 
-StatefulObject::StatefulObject() {
-	this->state = NULL;
-	this->listeners = { NULL, 0 };
-}
-
-stateful_state_t* StatefulObject::getState() const {
-	return state;
+const stateful_state_t& StatefulObject::getState() {
+	return *(state);
 }
 
 } /* namespace sfc */

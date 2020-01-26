@@ -22,8 +22,7 @@ Action::Action() :
 	this->condition_state_t0 = 0;
 }
 
-Action::Action(StepContext *context, stateful_state_t *state,
-		const size_t &step_id) :
+Action::Action(stateful_state_t * state, StepContext *context, const size_t &step_id) :
 		StatefulObject(state) {
 	this->context = context;
 	this->step_id = step_id;

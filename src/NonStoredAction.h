@@ -14,7 +14,7 @@ namespace sfc {
 
 class NonStoredAction: public Action {
 public:
-	NonStoredAction(StepContext *context, stateful_state_t *state,
+	NonStoredAction(stateful_state_t *state, StepContext *context,
 			const size_t &step_id);
 	virtual ~NonStoredAction();
 
