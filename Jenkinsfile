@@ -20,7 +20,7 @@ pipeline{
             echo "======== Finished"
             xunit (
                 thresholds: [ skipped(failureThreshold: '0'), failed(failureThreshold: '0') ],
-                tools: [ GoogleTest(pattern: 'build/*_test_report.xml') ])
+                tools: [ GoogleTest(pattern: 'build/*_test_report.xml') ]
             )
         }
     }
