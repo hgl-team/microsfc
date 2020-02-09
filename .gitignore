@@ -5,3 +5,7 @@ Release/
 .project
 build/
 .vscode/
+*.gcno
+*.gcda
+*.gcov
+converage.xml
