@@ -3,14 +3,14 @@ pipeline{
     stages{
         stage("Build"){
             steps{
-                echo "============ building"
+                echo "============ building "
                 sh 'mkdir -p build'
                 sh 'g++ -g $(find -type f -iregex \'.*\\.cpp\') -o build/microsfc-test.out -I /usr/include -I /usr/local/include/gtest -I /usr/local/include/gmock -I . -L/usr/local/lib/ -lgtest -lgtest_main -lgmock -lpthread'
             }
         }
         stage("Test") {
             steps {
-                echo "============ testing"
+                echo "============ testing "
                 sh 'build/microsfc-test.out --gtest_output="xml:build/microsfc_test_report.xml"'
             }
         }
