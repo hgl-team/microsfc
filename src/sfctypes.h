@@ -20,6 +20,8 @@
 #define PTR_ACTIVATING(state) (((state)->active) && ((state)->transiting))
 #define PTR_DEACTIVATING(state) (!((state)->active) && ((state)->transiting))
 
+#define ARRAY_GET(a,i) ((a).ptr + (i)) 
+
 namespace sfc {
 
 template<typename T>

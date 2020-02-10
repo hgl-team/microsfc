@@ -25,13 +25,12 @@ typedef struct {
 
 class Application : public StatefulObject, public StepContext {
 private:
-	state_context_t state_context;
 	component_context_t container_context;
 protected:
 	virtual void stateChanged(const stateful_state_t &state);
 public:
 	Application();
-	Application(stateful_state_t * application_state, const state_context_t & state_context, const component_context_t & container_context);
+	Application(const component_context_t & container_context);
 	virtual ~Application();
 	const virtual sfc::stateful_state_t& getStepState(const int &id);
 	virtual size_t getStepCount();

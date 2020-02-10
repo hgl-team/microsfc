@@ -28,7 +28,7 @@ class NonStoredActionTest: public testing::Test, public EventListener {
 public:
 	stateful_state_t state;
 	stateful_state_t reported_state;
-	NonStoredAction action = NonStoredAction(NULL, NULL, 0);
+	NonStoredAction action = NonStoredAction(0);
 	MockNonStoredArtifactContainer container;
 
 	virtual void onActivationChanged(const sfc::stateful_state_t &state) {
@@ -37,7 +37,8 @@ public:
 
 	NonStoredActionTest() {
 		state = { 0, false, false };
-		action = NonStoredAction(&state, &container, 0);
+		action = NonStoredAction(0);
+		action.setStepContext(&container);
 		action.setListeners( { this, 1 });
 	}
 };

@@ -15,53 +15,51 @@ using namespace sfc;
 
 class StatefulObjectTest: public testing::Test {
 public:
-	stateful_state_t state;
 	StatefulObject stateful_obj;
 
 	StatefulObjectTest() {
-		state = { 0, false, false };
-		stateful_obj = StatefulObject(&state);
+		stateful_obj = StatefulObject();
 	}
 };
 
 TEST_F(StatefulObjectTest, objectActivatingAndTransiting) {
 	stateful_obj.activate();
-	EXPECT_TRUE(state.active);
-	EXPECT_TRUE(ACTIVATING(state));
+	EXPECT_TRUE(stateful_obj.getState()->active);
+	EXPECT_TRUE(PTR_ACTIVATING(stateful_obj.getState()));
 }
 
 TEST_F(StatefulObjectTest, activatedObjectNoTransitingAfterTick) {
 	stateful_obj.activate();
-	EXPECT_TRUE(state.active);
-	EXPECT_TRUE(ACTIVATING(state));
+	EXPECT_TRUE(stateful_obj.getState()->active);
+	EXPECT_TRUE(PTR_ACTIVATING(stateful_obj.getState()));
 	stateful_obj.onTick(1);
-	EXPECT_TRUE(state.active);
-	EXPECT_TRUE(!ACTIVATING(state));
+	EXPECT_TRUE(stateful_obj.getState()->active);
+	EXPECT_TRUE(!PTR_ACTIVATING(stateful_obj.getState()));
 }
 
 TEST_F(StatefulObjectTest, deactivatedObjectTransiting) {
-	state.active = true;
-	state.active_time = 1;
-	state.transiting = false;
+	stateful_obj.getState()->active = true;
+	stateful_obj.getState()->active_time = 1;
+	stateful_obj.getState()->transiting = false;
 
 	stateful_obj.shutdown();
 
-	ASSERT_FALSE(state.active);
-	ASSERT_TRUE(DEACTIVATING(state));
+	ASSERT_FALSE(stateful_obj.getState()->active);
+	ASSERT_TRUE(PTR_DEACTIVATING(stateful_obj.getState()));
 }
 
 TEST_F(StatefulObjectTest, deactivatedObjectNotTransitingAfterTick) {
-	state.active = true;
-	state.active_time = 1;
-	state.transiting = false;
+	stateful_obj.getState()->active = true;
+	stateful_obj.getState()->active_time = 1;
+	stateful_obj.getState()->transiting = false;
 
 	stateful_obj.shutdown();
 
-	ASSERT_FALSE(state.active);
-	ASSERT_TRUE(DEACTIVATING(state));
+	ASSERT_FALSE(stateful_obj.getState()->active);
+	ASSERT_TRUE(PTR_DEACTIVATING(stateful_obj.getState()));
 
 	stateful_obj.onTick(1);
 
-	ASSERT_FALSE(state.active);
-	ASSERT_FALSE(DEACTIVATING(state));
+	ASSERT_FALSE(stateful_obj.getState()->active);
+	ASSERT_FALSE(PTR_DEACTIVATING(stateful_obj.getState()));
 }

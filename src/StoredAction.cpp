@@ -13,9 +13,8 @@ StoredAction::StoredAction() :
 		Action() {
 }
 
-StoredAction::StoredAction(stateful_state_t *state, StepContext *context,
-		const size_t &step_id) :
-		Action(state, context, step_id) {
+StoredAction::StoredAction(const size_t &step_id) :
+		Action(step_id) {
 }
 
 StoredAction::~StoredAction() {

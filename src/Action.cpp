@@ -22,9 +22,9 @@ Action::Action() :
 	this->condition_state_t0 = 0;
 }
 
-Action::Action(stateful_state_t * state, StepContext *context, const size_t &step_id) :
-		StatefulObject(state) {
-	this->context = context;
+Action::Action(const size_t &step_id) :
+		StatefulObject() {
+	this->context = NULL;
 	this->step_id = step_id;
 	this->on_activation_changed = NULL;
 	this->condition = NULL;
@@ -92,6 +92,10 @@ void Action::stateChanged(const sfc::stateful_state_t &state) {
 	if (this->on_activation_changed != 0) {
 		this->on_activation_changed(this->activation_state);
 	}
+}
+
+void Action::setStepContext(StepContext * context) {
+	this->context = context;
 }
 
 } /* namespace sfc */

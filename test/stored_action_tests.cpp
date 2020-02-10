@@ -32,7 +32,6 @@ public:
 
 class StoredActionTest: public testing::Test, public EventListener {
 public:
-	stateful_state_t state;
 	stateful_state_t reported_state;
 	StoredAction action;
 	MockArtifactContainer container;
@@ -42,8 +41,8 @@ public:
 	}
 
 	StoredActionTest() {
-		state = { 0, false, false };
-		action = StoredAction(&state, &container, 0);
+		action = StoredAction(0);
+		action.setStepContext(&container);
 		action.setListeners( { this, 1 });
 	}
 };
