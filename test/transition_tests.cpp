@@ -5,8 +5,8 @@
  *      Author: leonardo
  */
 
-#include "gtest.h"
-#include "gmock.h"
+#include <gtest.h>
+#include <gmock/gmock.h>
 
 #include "../src/sfctypes.h"
 #include "../src/Transition.h"
@@ -29,8 +29,10 @@ public:
 	Transition transition;
 
 	TransitionTest() {
-		transition = Transition(&container, { input_ids, 3 }, { input_ids, 3 },
-				NULL);
+		transition = Transition(
+			{ input_ids, 3 }, 
+			{ output_ids, 3 }, NULL);
+		transition.setStepContext(&container);
 	}
 };
 

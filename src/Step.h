@@ -17,7 +17,7 @@ private:
 	bool entry_point;
 public:
 	Step();
-	Step(stateful_state_t * state, bool entry_point);
+	Step(bool entry_point);
 	virtual ~Step();
 	virtual bool isEntryPoint() const;
 	virtual void setEntryPoint(bool entryPoint);

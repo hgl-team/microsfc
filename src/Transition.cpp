@@ -9,10 +9,10 @@
 
 namespace sfc {
 
-Transition::Transition(StepContext *context,
-		const array<int> &input_step_ids, const array<int> &output_step_ids,
+Transition::Transition(const array<int> &input_step_ids, 
+		const array<int> &output_step_ids,
 		predicate_fnc condition) {
-	this->context = context;
+	this->context = NULL;
 	this->input_step_ids = input_step_ids;
 	this->output_step_ids = output_step_ids;
 	this->condition = condition;
@@ -55,6 +55,10 @@ predicate_fnc Transition::getCondition() const {
 
 void Transition::setCondition(predicate_fnc condition) {
 	this->condition = condition;
+}
+
+void Transition::setStepContext(StepContext * context) {
+	this->context = context;
 }
 
 } /* namespace sfc */

@@ -15,7 +15,7 @@ namespace sfc {
 
 class StatefulObject: public ClockListener {
 private:
-	stateful_state_t* state;
+	stateful_state_t state;
 	array<EventListener> listeners;
 
 	void reportState(const stateful_state_t &state);
@@ -25,7 +25,6 @@ protected:
 	virtual void stateChanged(const stateful_state_t &state);
 public:
 	StatefulObject();
-	StatefulObject(stateful_state_t * state);
 	virtual ~StatefulObject();
 
 	virtual void onTick(const sfc::ulong_t &delta);
@@ -34,7 +33,7 @@ public:
 
 	const array<EventListener>& getListeners() const;
 	void setListeners(const array<EventListener> &listeners);
-	const stateful_state_t& getState();
+	stateful_state_t* getState();
 };
 
 } /* namespace sfc */

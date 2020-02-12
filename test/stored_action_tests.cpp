@@ -5,13 +5,8 @@
  *      Author: leonardo
  */
 
-#include "gtest.h"
-#include "gmock.h"
-
-#include "../src/sfctypes.h"
-#include "../src/time/Timer.h"
-#include "../src/time/ClockListener.h"
-#include "gtest.h"
+#include <gtest.h>
+#include <gmock/gmock.h>
 
 #include "../src/sfctypes.h"
 #include "../src/time/Timer.h"
@@ -32,7 +27,6 @@ public:
 
 class StoredActionTest: public testing::Test, public EventListener {
 public:
-	stateful_state_t state;
 	stateful_state_t reported_state;
 	StoredAction action;
 	MockArtifactContainer container;
@@ -42,8 +36,8 @@ public:
 	}
 
 	StoredActionTest() {
-		state = { 0, false, false };
-		action = StoredAction(&state, &container, 0);
+		action = StoredAction(0);
+		action.setStepContext(&container);
 		action.setListeners( { this, 1 });
 	}
 };
@@ -59,9 +53,11 @@ TEST_F(StoredActionTest, actionDoesNotActivateIfStepDoesnt) {
 }
 
 TEST_F(StoredActionTest, actionActivatesIfStepDoes) {
-	EXPECT_CALL(container, getStepState(_)).Times(1).WillOnce(
-			::testing::ReturnRefOfCopy(activatingState));
+	EXPECT_CALL(container, getStepState(_)).Times(2)
+		.WillOnce(::testing::ReturnRefOfCopy(activatingState))
+		.WillOnce(::testing::ReturnRefOfCopy(activeState));
 
+	action.onTick(1);
 	action.onTick(1);
 
 	ASSERT_TRUE(reported_state.active);
@@ -69,10 +65,12 @@ TEST_F(StoredActionTest, actionActivatesIfStepDoes) {
 }
 
 TEST_F(StoredActionTest, actionActivatesAndNotTransitingIfStepActive) {
-	EXPECT_CALL(container, getStepState(_)).Times(2).WillOnce(
-			testing::ReturnRefOfCopy(activatingState)).WillOnce(
-			testing::ReturnRefOfCopy(activeState));
+	EXPECT_CALL(container, getStepState(_)).Times(3)
+		.WillOnce(testing::ReturnRefOfCopy(activatingState))
+		.WillOnce(testing::ReturnRefOfCopy(activeState))
+		.WillOnce(testing::ReturnRefOfCopy(activeState));
 
+	action.onTick(1);
 	action.onTick(1);
 
 	ASSERT_TRUE(reported_state.active);
@@ -85,16 +83,19 @@ TEST_F(StoredActionTest, actionActivatesAndNotTransitingIfStepActive) {
 }
 
 TEST_F(StoredActionTest, actionKeepsActiveAfterStepDeactivated) {
-	EXPECT_CALL(container, getStepState(_)).Times(10).WillOnce(
+	EXPECT_CALL(container, getStepState(_)).Times(12).WillOnce(
 			testing::ReturnRefOfCopy(activatingState)).WillOnce(
 			testing::ReturnRefOfCopy(activeState)).WillOnce(
 			testing::ReturnRefOfCopy(deactivatingState)).WillRepeatedly(
 			testing::ReturnRefOfCopy(deactivatedState));
 
 	action.onTick(1);
+	action.onTick(1);
 
 	ASSERT_TRUE(reported_state.active);
 	ASSERT_TRUE(reported_state.transiting);
+	
+	action.onTick(1);
 
 	for (int i = 0; i < 9; i++) {
 		action.onTick(1);
@@ -105,10 +106,11 @@ TEST_F(StoredActionTest, actionKeepsActiveAfterStepDeactivated) {
 }
 
 TEST_F(StoredActionTest, actionKeepsDeactiveEvenIfStepIsActive) {
-	EXPECT_CALL(container, getStepState(_)).Times(10).WillOnce(
-			testing::ReturnRefOfCopy(activatingState)).WillRepeatedly(
-			testing::ReturnRefOfCopy(activeState));
+	EXPECT_CALL(container, getStepState(_)).Times(12)
+		.WillOnce(testing::ReturnRefOfCopy(activatingState))
+		.WillRepeatedly(testing::ReturnRefOfCopy(activeState));
 
+	action.onTick(1);
 	action.onTick(1);
 
 	ASSERT_TRUE(ACTIVATING(reported_state));
@@ -116,6 +118,7 @@ TEST_F(StoredActionTest, actionKeepsDeactiveEvenIfStepIsActive) {
 	for (int i = 0; i < 9; i++) {
 		if (i == 5) {
 			action.shutdown();
+			action.onTick(1);
 		}
 
 		action.onTick(1);
@@ -136,15 +139,17 @@ TEST_F(StoredActionTest, actionKeepsDeactiveEvenIfStepIsActive) {
 TEST_F(StoredActionTest, actionActivatesAfterConditionSet) {
 	action.setCondition(active_after_5_ticks);
 
-	EXPECT_CALL(container, getStepState(_)).Times(testing::AtLeast(1)).WillOnce(
-			testing::ReturnRefOfCopy(activatingState)).WillRepeatedly(
-			testing::ReturnRefOfCopy(activeState));
+	EXPECT_CALL(container, getStepState(_)).Times(testing::AtLeast(1))
+		.WillOnce(testing::ReturnRefOfCopy(activatingState))
+		.WillRepeatedly(testing::ReturnRefOfCopy(activeState));
+
+	action.onTick(1);
 
 	for (int i = 0; i < 4; i++) {
-		action.onTick(1);
-
 		ASSERT_FALSE(reported_state.active);
 		ASSERT_FALSE(reported_state.transiting);
+
+		action.onTick(1);
 	}
 
 	action.onTick(1);
@@ -161,12 +166,14 @@ TEST_F(StoredActionTest, actionActivatesAfterConditionSetEvenIfStepDeactivated) 
 			testing::ReturnRefOfCopy(activeState)).WillOnce(
 			testing::ReturnRefOfCopy(deactivatingState)).WillRepeatedly(
 			testing::ReturnRefOfCopy(deactivatedState));
+	
+	action.onTick(1);
 
 	for (int i = 0; i < 4; i++) {
-		action.onTick(1);
-
 		ASSERT_FALSE(reported_state.active);
 		ASSERT_FALSE(reported_state.transiting);
+		
+		action.onTick(1);
 	}
 
 	action.onTick(1);

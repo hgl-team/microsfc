@@ -16,12 +16,11 @@ class Timer: public ClockListener {
 private:
 	ulong_t period;
 	bool continous;
-	timer_state_t *timer_state;
+	timer_state_t timer_state;
 public:
 	Timer();
-	Timer(timer_state_t *timer_state, const ulong_t &period,
-			const bool &continous);
-	Timer(timer_state_t *timer_state, const ulong_t &period);
+	Timer(const ulong_t &period, const bool &continous);
+	Timer(const ulong_t &period);
 	virtual ~Timer();
 
 	virtual void onTick(const sfc::ulong_t &time);
@@ -29,6 +28,7 @@ public:
 	virtual void enable();
 	virtual void reset();
 	virtual void disable();
+	virtual timer_state_t * getState();
 };
 
 } /* namespace sfc */

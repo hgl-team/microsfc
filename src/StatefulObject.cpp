@@ -13,12 +13,7 @@ StatefulObject::~StatefulObject() {
 }
 
 StatefulObject::StatefulObject() {
-	this->state = state;
-	this->listeners = { NULL, 0 };
-}
-
-StatefulObject::StatefulObject(stateful_state_t * state) {
-	this->state = state;
+	this->state = { 0, false, false };
 	this->listeners = { NULL, 0 };
 }
 
@@ -30,26 +25,25 @@ void StatefulObject::reportState(const stateful_state_t &state) {
 
 void StatefulObject::onTick(const sfc::ulong_t &delta) {
 
-	this->stateChanged(*(this->state));
-	this->reportState(*(this->state));
+	this->stateChanged(this->state);
+	this->reportState(this->state);
 
-	this->state->active_time =
-			(!(this->state->active) || PTR_ACTIVATING(this->state)) ?
-					this->state->active_time : this->state->active_time + delta;
-	this->state->transiting = false;
+	this->state.transiting = (this->state.activated) ^ (this->state.active);
+	this->state.active = this->state.activated;
+	this->state.active_time =
+			(!(this->state.active) || ACTIVATING(this->state)) ?
+					this->state.active_time : this->state.active_time + delta;
 }
 
 void StatefulObject::activate() {
-	if (!(this->state->active)) {
-		this->state->active = true;
-		this->state->active_time = 0;
-		this->state->transiting = true;
+	if (!(this->state.activated)) {
+		this->state.activated = true;
+		this->state.active_time = 0;
 	}
 }
 
 void StatefulObject::shutdown() {
-	this->state->transiting = this->state->active;
-	this->state->active = false;
+	this->state.activated = false;
 }
 
 void StatefulObject::reportState(const stateful_state_t &state,
@@ -68,8 +62,8 @@ void StatefulObject::setListeners(const array<EventListener> &listeners) {
 	this->listeners = listeners;
 }
 
-const stateful_state_t& StatefulObject::getState() {
-	return *(state);
+stateful_state_t* StatefulObject::getState() {
+	return &(this->state);
 }
 
 } /* namespace sfc */

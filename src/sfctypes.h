@@ -18,7 +18,11 @@
 #define ACTIVATING(state) (((state).active) && ((state).transiting))
 #define DEACTIVATING(state) (!((state).active) && ((state).transiting))
 #define PTR_ACTIVATING(state) (((state)->active) && ((state)->transiting))
+#define PTR_ACTIVE(state) ((state)->active)
 #define PTR_DEACTIVATING(state) (!((state)->active) && ((state)->transiting))
+#define PTR_DEACTIVATED(state) ((state)->active)
+
+#define ARRAY_GET(a,i) ((a).ptr + (i)) 
 
 namespace sfc {
 
@@ -27,6 +31,11 @@ struct array {
 	T *ptr;
 	size_t size;
 };
+
+template<typename T>
+inline array<T> arrayof(T * ptr, const size_t& size) {
+	return {ptr, size};
+}
 
 typedef unsigned char byte_t;
 typedef unsigned long ulong_t;
@@ -38,6 +47,7 @@ typedef struct {
 } timer_state_t;
 typedef struct {
 	ulong_t active_time;
+	bool activated :1;
 	bool active :1;
 	bool transiting :1;
 } stateful_state_t;

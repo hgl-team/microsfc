@@ -9,15 +9,19 @@
 
 namespace sfc {
 
-Application::Application(stateful_state_t * application_state, const state_context_t & state_context, const component_context_t & container_context)
-	: StatefulObject(application_state)
+Application::Application(const component_context_t & container_context)
+	: StatefulObject()
 {
-	this->state_context = state_context;
 	this->container_context = container_context;
+	for(size_t i = 0; i < this->container_context.actions.size; i++) {
+		ARRAY_GET(this->container_context.actions, i)->setStepContext(this);
+	}
+	for(size_t i = 0; i < this->container_context.transitions.size; i++) {
+		ARRAY_GET(this->container_context.transitions, i)->setStepContext(this);
+	}
 }
 
 Application::Application() : StatefulObject() {
-	this->state_context = { {NULL, 0}, {NULL, 0}, { NULL, 0 } };
 	this->container_context = { {NULL, 0}, {NULL, 0}, { NULL, 0 } };
 }
 
@@ -34,11 +38,25 @@ void Application::stateChanged(const stateful_state_t &state) {
 		for(size_t i = 0; i < this->getStepCount(); i++) {
 			this->toggleStepState(i, false);
 		}
+	} else if(state.active) {
+		for(size_t i = 0; i < this->container_context.transitions.size; i++) {
+			ARRAY_GET(this->container_context.transitions, i)->onActivationChanged(state);
+		}
+	}
+}
+
+void Application::onTick(const sfc::ulong_t &delta) {
+	StatefulObject::onTick(delta);
+	for(size_t i = 0; i < this->container_context.steps.size; i++) {
+		ARRAY_GET(this->container_context.steps, i)->onTick(delta);
+	}
+	for(size_t i = 0; i < this->container_context.actions.size; i++) {
+		ARRAY_GET(this->container_context.actions, i)->onTick(delta);
 	}
 }
 
 const sfc::stateful_state_t& Application::getStepState(const int &id) {
-	return *(this->state_context.step_states.ptr + id);
+	return *(ARRAY_GET(this->container_context.steps, id)->getState());
 }
 
 size_t Application::getStepCount() {
