@@ -5,7 +5,7 @@ pipeline{
             steps{
                 echo "============ building microsfc"
                 sh 'mkdir -p build'
-                sh 'g++ -g $(find -type f -iregex \'.*\\.cpp\') -o build/microsfc-test.out -I /usr/include -I /usr/local/include/gtest -I /usr/local/include/gmock -I . -L/usr/local/lib/ -lgtest -lgtest_main -lgmock -lpthread -lgcov -fprofile-arcs -ftest-coverage'
+                sh 'g++ -g $(find -type f -iregex \'.*/src/.*\\.cpp\') $(find -type f -iregex \'.*/test/.*\\.cpp\') -o build/microsfc-test.out -I /usr/include -I /usr/local/include/gtest -I /usr/local/include/gmock -I . -L/usr/local/lib/ -lgtest -lgtest_main -lgmock -lpthread -lgcov -fprofile-arcs -ftest-coverage'
             }
         }
         stage("Test") {
