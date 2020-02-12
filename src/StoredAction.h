@@ -18,6 +18,7 @@ private:
 public:
 	StoredAction();
 	StoredAction(const size_t &step_id);
+	StoredAction(const size_t &step_id, action_fnc on_state_changed);
 	virtual ~StoredAction();
 
 protected:

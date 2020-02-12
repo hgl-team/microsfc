@@ -13,6 +13,12 @@ Application::Application(const component_context_t & container_context)
 	: StatefulObject()
 {
 	this->container_context = container_context;
+	for(size_t i = 0; i < this->container_context.actions.size; i++) {
+		ARRAY_GET(this->container_context.actions, i)->setStepContext(this);
+	}
+	for(size_t i = 0; i < this->container_context.transitions.size; i++) {
+		ARRAY_GET(this->container_context.transitions, i)->setStepContext(this);
+	}
 }
 
 Application::Application() : StatefulObject() {
@@ -23,7 +29,6 @@ Application::~Application() { }
 
 void Application::stateChanged(const stateful_state_t &state) {
 	if(ACTIVATING(state)) {
-		
 		for(size_t i = 0; i < this->getStepCount(); i++) {
 			if(this->isEntryPoint(i)) {
 				this->toggleStepState(i, true);
@@ -33,6 +38,20 @@ void Application::stateChanged(const stateful_state_t &state) {
 		for(size_t i = 0; i < this->getStepCount(); i++) {
 			this->toggleStepState(i, false);
 		}
+	} else if(state.active) {
+		for(size_t i = 0; i < this->container_context.transitions.size; i++) {
+			ARRAY_GET(this->container_context.transitions, i)->onActivationChanged(state);
+		}
+	}
+}
+
+void Application::onTick(const sfc::ulong_t &delta) {
+	StatefulObject::onTick(delta);
+	for(size_t i = 0; i < this->container_context.steps.size; i++) {
+		ARRAY_GET(this->container_context.steps, i)->onTick(delta);
+	}
+	for(size_t i = 0; i < this->container_context.actions.size; i++) {
+		ARRAY_GET(this->container_context.actions, i)->onTick(delta);
 	}
 }
 

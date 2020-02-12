@@ -13,7 +13,6 @@
 
 using namespace sfc;
 
-extern timer_state_t _5_tick_timer_state;
 extern Timer _5_tick_timer;
 extern const stateful_state_t deactivatedState;
 extern const stateful_state_t activatingState;

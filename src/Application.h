@@ -36,6 +36,7 @@ public:
 	virtual size_t getStepCount();
 	virtual bool isEntryPoint(const int &id);
 	virtual void toggleStepState(const int &id, const bool &active);
+	virtual void onTick(const sfc::ulong_t &delta);
 };
 
 } /* namespace sfc */

@@ -43,6 +43,8 @@ public:
 
 TEST_F(ApplicationTest, activatesStepsWhenActivating) {
 	application.activate();
+
+	application.onTick(1);
 	application.onTick(1);
 
 	for(size_t i = 0; i < 3; i++) {
@@ -61,6 +63,7 @@ TEST_F(ApplicationTest, deactivatesStepsWhenDeactivating) {
 
 	application.shutdown();
 	application.onTick(1);
+	application.onTick(1);
 
 	for(size_t i = 0; i < 3; i++) {
 		EXPECT_TRUE(PTR_DEACTIVATING(steps[i].getState()));
@@ -72,6 +75,7 @@ TEST_F(ApplicationTest, shutdownStepWhenToggleStepToFalse) {
 	step_states[0]->transiting = 0;
 
 	application.toggleStepState(0, false);
+	application.onTick(1);
 
 	ASSERT_TRUE(PTR_DEACTIVATING(step_states[0]));
 }

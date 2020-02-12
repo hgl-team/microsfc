@@ -5,8 +5,8 @@
  *      Author: leonardo
  */
 
-#include "gtest.h"
-#include "gmock.h"
+#include <gtest.h>
+#include <gmock/gmock.h>
 
 #include "../src/sfctypes.h"
 #include "../src/Transition.h"

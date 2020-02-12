@@ -28,23 +28,22 @@ void StatefulObject::onTick(const sfc::ulong_t &delta) {
 	this->stateChanged(this->state);
 	this->reportState(this->state);
 
+	this->state.transiting = (this->state.activated) ^ (this->state.active);
+	this->state.active = this->state.activated;
 	this->state.active_time =
 			(!(this->state.active) || ACTIVATING(this->state)) ?
 					this->state.active_time : this->state.active_time + delta;
-	this->state.transiting = false;
 }
 
 void StatefulObject::activate() {
-	if (!(this->state.active)) {
-		this->state.active = true;
+	if (!(this->state.activated)) {
+		this->state.activated = true;
 		this->state.active_time = 0;
-		this->state.transiting = true;
 	}
 }
 
 void StatefulObject::shutdown() {
-	this->state.transiting = this->state.active;
-	this->state.active = false;
+	this->state.activated = false;
 }
 
 void StatefulObject::reportState(const stateful_state_t &state,

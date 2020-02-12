@@ -9,7 +9,7 @@
 
 namespace sfc {
 
-Clock::Clock(const array<ClockListener> &listeners) {
+Clock::Clock(const array<ClockListener*> &listeners) {
 	this->listeners = listeners;
 	this->current_time = 0;
 }
@@ -27,7 +27,8 @@ void Clock::tick(const ulong_t &time) {
 	this->current_time = time;
 
 	for (size_t i = 0; i < this->listeners.size; i++) {
-		(this->listeners.ptr + i)->onTick(delta);
+		ClockListener* listener = *ARRAY_GET(this->listeners, i);
+		listener->onTick(delta);
 	}
 }
 
@@ -36,7 +37,7 @@ Clock::Clock() {
 	this->current_time = 0;
 }
 
-const array<ClockListener>& Clock::getListeners() const {
+const array<ClockListener*>& Clock::getListeners() const {
 	return listeners;
 }
 

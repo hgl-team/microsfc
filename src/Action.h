@@ -27,10 +27,11 @@ private:
 
 protected:
 	virtual void stateChanged(const sfc::stateful_state_t &state);
-	virtual bool evaluateActivation(const sfc::predicate_state_t &state) = 0;
+	virtual bool evaluateActivation(const sfc::predicate_state_t &state);
 public:
 	Action();
 	Action(const size_t &step_id);
+	Action(const size_t &step_id, action_fnc on_state_changed);
 	virtual ~Action();
 	activation_predicate_fnc getCondition() const;
 	void setCondition(activation_predicate_fnc condition);
@@ -39,6 +40,8 @@ public:
 	action_fnc getOnActivationChanged() const;
 	void setOnActivationChanged(action_fnc onActivationChanged);	
 };
+
+typedef Action * ActionPtr;
 
 } /* namespace sfc */
 
