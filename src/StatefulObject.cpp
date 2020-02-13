@@ -18,14 +18,14 @@ StatefulObject::StatefulObject() {
 }
 
 void StatefulObject::reportState(const stateful_state_t &state) {
+	this->stateReported(this->state);
+
 	for (size_t i = 0; i < this->listeners.size; i++) {
 		this->reportState(state, this->listeners.ptr + i);
 	}
 }
 
 void StatefulObject::onTick(const sfc::ulong_t &delta) {
-
-	this->stateChanged(this->state);
 	this->reportState(this->state);
 
 	this->state.transiting = (this->state.activated) ^ (this->state.active);
@@ -51,7 +51,7 @@ void StatefulObject::reportState(const stateful_state_t &state,
 	listener->onActivationChanged(state);
 }
 
-void StatefulObject::stateChanged(const stateful_state_t &state) {
+void StatefulObject::stateReported(const stateful_state_t &state) {
 }
 
 const array<EventListener>& StatefulObject::getListeners() const {
