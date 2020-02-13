@@ -22,7 +22,7 @@ private:
 	void reportState(const stateful_state_t &state,
 			EventListener *const&listener);
 protected:
-	virtual void stateChanged(const stateful_state_t &state);
+	virtual void stateReported(const stateful_state_t &state);
 public:
 	StatefulObject();
 	virtual ~StatefulObject();

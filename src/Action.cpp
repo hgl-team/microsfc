@@ -13,7 +13,7 @@ Action::Action() :
 		StatefulObject() {
 	this->context = NULL;
 	this->step_id = 0;
-	this->on_activation_changed = NULL;
+	this->on_activation_reported_fnc = NULL;
 	this->condition = NULL;
 
 	this->activation_state = { { 0, false, false }, { 0, false, false }, { 0,
@@ -26,7 +26,7 @@ Action::Action(const size_t &step_id) :
 		StatefulObject() {
 	this->context = NULL;
 	this->step_id = step_id;
-	this->on_activation_changed = NULL;
+	this->on_activation_reported_fnc = NULL;
 	this->condition = NULL;
 
 	this->activation_state = { { 0, false, false }, { 0, false, false }, { 0,
@@ -35,16 +35,31 @@ Action::Action(const size_t &step_id) :
 	this->condition_state_t0 = 0;
 }
 
-Action::Action(const size_t &step_id, action_fnc on_state_changed) {
+Action::Action(const size_t &step_id, action_fnc on_activation_reported_fnc) {
 	this->context = NULL;
 	this->step_id = step_id;
-	this->on_activation_changed = on_state_changed;
+	this->on_activation_reported_fnc = on_activation_reported_fnc;
 	this->condition = NULL;
 
 	this->activation_state = { { 0, false, false }, { 0, false, false }, { 0,
 			false, false }, false };
 	this->condition_state = { 0, false, false };
 	this->condition_state_t0 = 0;
+}
+
+void Action::activate() {
+	if (!(this->getState()->activated)) {
+		this->getState()->activated = true;
+		this->getState()->active = true;
+		this->getState()->transiting = true;
+		this->getState()->active_time = 0;
+	}
+}
+
+void Action::shutdown() {
+	this->getState()->activated = false;
+	this->getState()->transiting = (this->getState()->activated) ^ (this->getState()->active);
+	this->getState()->active = false;
 }
 
 activation_predicate_fnc Action::getCondition() const {
@@ -55,19 +70,19 @@ void Action::setCondition(activation_predicate_fnc condition) {
 	this->condition = condition;
 }
 
-action_fnc Action::getOnActivationChanged() const {
-	return on_activation_changed;
+action_fnc Action::getOnActivationReported() const {
+	return on_activation_reported_fnc;
 }
 
-void Action::setOnActivationChanged(action_fnc onActivationChanged) {
-	on_activation_changed = onActivationChanged;
+void Action::setOnActivationReported(action_fnc on_activation_reported_fnc) {
+	on_activation_reported_fnc = on_activation_reported_fnc;
 }
 
 Action::~Action() {
 	// TODO Auto-generated destructor stub
 }
 
-void Action::stateChanged(const sfc::stateful_state_t &state) {
+void Action::stateReported(const sfc::stateful_state_t &state) {
 	// stateful_state_t step_state;
 	// Join between current action state and step state.
 	predicate_state_t predicate_state { 
@@ -105,8 +120,8 @@ void Action::stateChanged(const sfc::stateful_state_t &state) {
 		this->shutdown();
 	}
 
-	if (this->on_activation_changed != 0) {
-		this->on_activation_changed(this->activation_state);
+	if (this->on_activation_reported_fnc != 0) {
+		this->on_activation_reported_fnc(this->activation_state);
 	}
 }
 
