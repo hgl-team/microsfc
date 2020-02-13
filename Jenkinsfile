@@ -12,7 +12,7 @@ pipeline{
             steps {
                 echo "============ testing  microsfc"
                 sh 'build/microsfc-test.out --gtest_output="xml:build/microsfc_test_report.xml"'
-                sh 'gcovr --gcov-exclude=".*gtest.*"  --gcov-exclude=".*test.*" -x -d > coverage.xml'
+                sh 'gcovr --gcov-exclude=".*gtest.*"  --gcov-exclude=".*test.*" --gcov-exclude=".*example.*" -x -d > coverage.xml'
                 echo "============ cleaning "
                 sh 'ls *.gcno | xargs -L1 -I{} mv {} build/'
                 sh 'ls *.gcda | xargs -L1 -I{} mv {} build/'
