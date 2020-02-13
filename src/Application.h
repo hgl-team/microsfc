@@ -27,7 +27,7 @@ class Application : public StatefulObject, public StepContext {
 private:
 	component_context_t container_context;
 protected:
-	virtual void stateChanged(const stateful_state_t &state);
+	virtual void stateReported(const stateful_state_t &state);
 public:
 	Application();
 	Application(const component_context_t & container_context);

@@ -27,7 +27,7 @@ Application::Application() : StatefulObject() {
 
 Application::~Application() { }
 
-void Application::stateChanged(const stateful_state_t &state) {
+void Application::stateReported(const stateful_state_t &state) {
 	if(ACTIVATING(state)) {
 		for(size_t i = 0; i < this->getStepCount(); i++) {
 			if(this->isEntryPoint(i)) {
