@@ -16,32 +16,26 @@ namespace sfc {
 
 class Action: public StatefulObject {
 private:
-	StepContext *context;
 	size_t step_id;
-	action_fnc on_activation_reported_fnc;
 	activation_predicate_fnc condition;
+	array<action_state_handler_t> handlers;
 
+	StatefulObject condition_state;
 	activation_state_t activation_state;
-	stateful_state_t condition_state;
-	ulong_t condition_state_t0;
-
 protected:
-	virtual void stateReported(const sfc::stateful_state_t &state);
 	virtual bool evaluateActivation(const sfc::predicate_state_t &state);
 public:
 	Action();
 	Action(const size_t &step_id);
-	Action(const size_t &step_id, action_fnc on_activation_reported_fnc);
+	Action(const size_t &step_id, activation_predicate_fnc condition);
+	Action(const size_t &step_id, array<action_state_handler_t> handlers);
+	Action(const size_t &step_id, activation_predicate_fnc condition, array<action_state_handler_t> handlers);
 	virtual ~Action();
-	virtual void activate();
-	virtual void shutdown();
 
-	activation_predicate_fnc getCondition() const;
-	void setCondition(activation_predicate_fnc condition);
-	void setStepContext(StepContext * context);
+	virtual void evaluate(StepContext * const& context);
+	virtual void onTick(const sfc::ulong_t & delta, StepContext * const& context);
 
-	action_fnc getOnActivationReported() const;
-	void setOnActivationReported(action_fnc on_activation_reported_fnc);
+	size_t getStepId();
 };
 
 typedef Action * ActionPtr;
