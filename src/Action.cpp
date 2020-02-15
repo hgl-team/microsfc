@@ -11,122 +11,118 @@ namespace sfc {
 
 Action::Action() :
 		StatefulObject() {
-	this->context = NULL;
 	this->step_id = 0;
-	this->on_activation_reported_fnc = NULL;
+	this->handlers = { NULL, 0 };
 	this->condition = NULL;
 
 	this->activation_state = { { 0, false, false }, { 0, false, false }, { 0,
 			false, false }, false };
-	this->condition_state = { 0, false, false };
-	this->condition_state_t0 = 0;
+	this->condition_state = StatefulObject();
 }
 
 Action::Action(const size_t &step_id) :
 		StatefulObject() {
-	this->context = NULL;
 	this->step_id = step_id;
-	this->on_activation_reported_fnc = NULL;
+	this->handlers = { NULL, 0 };
 	this->condition = NULL;
 
 	this->activation_state = { { 0, false, false }, { 0, false, false }, { 0,
 			false, false }, false };
-	this->condition_state = { 0, false, false };
-	this->condition_state_t0 = 0;
+	this->condition_state = StatefulObject();
 }
-
-Action::Action(const size_t &step_id, action_fnc on_activation_reported_fnc) {
-	this->context = NULL;
+Action::Action(const size_t &step_id, activation_predicate_fnc condition) :
+		StatefulObject() {
 	this->step_id = step_id;
-	this->on_activation_reported_fnc = on_activation_reported_fnc;
-	this->condition = NULL;
-
-	this->activation_state = { { 0, false, false }, { 0, false, false }, { 0,
-			false, false }, false };
-	this->condition_state = { 0, false, false };
-	this->condition_state_t0 = 0;
-}
-
-void Action::activate() {
-	if (!(this->getState()->activated)) {
-		this->getState()->activated = true;
-		this->getState()->active = true;
-		this->getState()->transiting = true;
-		this->getState()->active_time = 0;
-	}
-}
-
-void Action::shutdown() {
-	this->getState()->activated = false;
-	this->getState()->transiting = (this->getState()->activated) ^ (this->getState()->active);
-	this->getState()->active = false;
-}
-
-activation_predicate_fnc Action::getCondition() const {
-	return condition;
-}
-
-void Action::setCondition(activation_predicate_fnc condition) {
+	this->handlers = { NULL, 0 };
 	this->condition = condition;
+
+	this->activation_state = { { 0, false, false }, { 0, false, false }, { 0,
+			false, false }, false };
+	this->condition_state = StatefulObject();
 }
 
-action_fnc Action::getOnActivationReported() const {
-	return on_activation_reported_fnc;
-}
+Action::Action(const size_t &step_id, array<action_state_handler_t> handlers) {
+	this->step_id = step_id;
+	this->handlers = handlers;
+	this->condition = NULL;
 
-void Action::setOnActivationReported(action_fnc on_activation_reported_fnc) {
-	on_activation_reported_fnc = on_activation_reported_fnc;
+	this->activation_state = { { 0, false, false }, { 0, false, false }, { 0,
+			false, false }, false };
+	this->condition_state = StatefulObject();
+}
+Action::Action(const size_t &step_id, activation_predicate_fnc condition, array<action_state_handler_t> handlers) {
+	this->step_id = step_id;
+	this->handlers = handlers;
+	this->condition = condition;
+
+	this->activation_state = { { 0, false, false }, { 0, false, false }, { 0,
+			false, false }, false };
+	this->condition_state = StatefulObject();
 }
 
 Action::~Action() {
-	// TODO Auto-generated destructor stub
 }
 
-void Action::stateReported(const sfc::stateful_state_t &state) {
-	// stateful_state_t step_state;
-	// Join between current action state and step state.
+void Action::evaluate(StepContext * const& context) {
 	predicate_state_t predicate_state { 
-		state, 
-		this->context->getStepState(this->step_id) 
+		*(this->getState()), 
+		context->getStepState(this->step_id)
 	};
+
 	// Evaluate the user defined predicate. 
 	bool condition = this->condition != NULL ? this->condition(predicate_state) : true;
 	// Evaluate the action-specific predicate.
 	bool activation = this->evaluateActivation(predicate_state);
+	
+	if(condition && activation) {
+		this->condition_state.activate();
+	} else {
+		this->condition_state.shutdown();
+	}
 
-	// Action is activated if both condition and activation are set. 
-	this->condition_state.activated = condition && activation;
-	this->condition_state.transiting = (condition ^ this->activation_state.active);
-	// Keep the condition value in the active state.
-	this->condition_state.active = condition;
-
-	this->condition_state_t0 = ACTIVATING(this->condition_state) ?
-					state.active_time : this->condition_state_t0;
-	this->condition_state.active_time = ACTIVATING(this->condition_state) ?
-					0 : this->condition_state.active_time;
-	this->condition_state.active_time +=
-			this->condition_state.activated ? (state.active_time - this->condition_state_t0) : 0;
-
-	// Activation state keeps the step state, condition state, and 
-	// previous action state, and also the activation signal.  
-	this->activation_state.step_state = predicate_state.step_state;
-	this->activation_state.condition_state = this->condition_state;
-	this->activation_state.action_state = state;
-	this->activation_state.active = this->condition_state.activated;
-
-	if (this->condition_state.activated && !state.active) {
+	if (PTR_ACTIVATED(this->condition_state.getState()) && !PTR_ACTIVATED(this->getState())) {
 		this->activate();
-	} else if (!(this->condition_state.activated) && state.active) {
+	} else if (!PTR_ACTIVATED(this->condition_state.getState()) && PTR_ACTIVATED(this->getState())) {
 		this->shutdown();
 	}
 
-	if (this->on_activation_reported_fnc != 0) {
-		this->on_activation_reported_fnc(this->activation_state);
-	}
+	this->activation_state.step_state = predicate_state.step_state;
+	this->activation_state.condition_state = *(this->condition_state.getState());
+	this->activation_state.action_state = *(this->getState());
+	this->activation_state.active = this->condition_state.getState()->activated;
 }
 
-void Action::setStepContext(StepContext * context) {
-	this->context = context;
+void Action::onTick(const sfc::ulong_t & delta, StepContext * const& context) {
+	StatefulObject::onTick(delta);
+	// Update the step state.
+	this->activation_state.step_state = context->getStepState(this->step_id);
+
+	for(size_t i = 0; i < this->handlers.size; i++) {
+		switch (ARRAY_GET(this->handlers, i)->action_state)
+		{
+		case ACTION_STATE_ACTIVATING:
+			if(PTR_ACTIVATING(this->getState())) {
+				ARRAY_GET(this->handlers, i)->function(this->activation_state);
+			}
+			break;
+		case ACTION_STATE_ACTIVE:
+			if(this->getState()->active) {
+				ARRAY_GET(this->handlers, i)->function(this->activation_state);
+			}
+			break;
+		case ACTION_STATE_DEACTIVATING:
+			if(PTR_DEACTIVATING(this->getState())) {
+				ARRAY_GET(this->handlers, i)->function(this->activation_state);
+			}
+			break;
+		case ACTION_STATE_INACTIVE:
+			if(!(this->getState()->active)) {
+				ARRAY_GET(this->handlers, i)->function(this->activation_state);
+			}
+			break;
+		default: break;
+		}
+	}
 }
 
 bool Action::evaluateActivation(const sfc::predicate_state_t &state) {

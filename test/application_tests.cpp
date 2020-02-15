@@ -31,7 +31,7 @@ class ApplicationTest : public testing::Test {
 public:
 	component_context_t component_context = {
 			array<Step> { steps, 3 },
-			array<Action> { NULL, 0 },
+			array<Action*> { NULL, 0 },
 			array<Transition> { NULL, 0 },
 	};
 	Application application;
@@ -45,8 +45,11 @@ TEST_F(ApplicationTest, activatesStepsWhenActivating) {
 	application.activate();
 
 	application.onTick(1);
-	application.onTick(1);
+	for(size_t i = 0; i < 3; i++) {
+		EXPECT_TRUE(step_states[i]->activated);
+	}
 
+	application.onTick(1);
 	for(size_t i = 0; i < 3; i++) {
 		EXPECT_TRUE(PTR_ACTIVATING(step_states[i]));
 	}
@@ -54,28 +57,36 @@ TEST_F(ApplicationTest, activatesStepsWhenActivating) {
 
 TEST_F(ApplicationTest, deactivatesStepsWhenDeactivating) {
 	for(size_t i = 0; i < 3; i++) {
+		(step_states[i])->activated = 1;
 		(step_states[i])->active = 1;
 		(step_states[i])->transiting = 0;
 	}
 
+	application.getState()->activated = true;
 	application.getState()->active = true;
 	application.getState()->transiting = false;
 
 	application.shutdown();
-	application.onTick(1);
-	application.onTick(1);
 
+	application.onTick(1);
+	for(size_t i = 0; i < 3; i++) {
+		EXPECT_FALSE(steps[i].getState()->activated);
+	}
+
+	application.onTick(1);
 	for(size_t i = 0; i < 3; i++) {
 		EXPECT_TRUE(PTR_DEACTIVATING(steps[i].getState()));
 	}
 }
 
 TEST_F(ApplicationTest, shutdownStepWhenToggleStepToFalse) {
+	step_states[0]->activated = 1;
 	step_states[0]->active = 1;
 	step_states[0]->transiting = 0;
 
 	application.toggleStepState(0, false);
 	application.onTick(1);
-
+	ASSERT_FALSE(step_states[0]->activated);
+	application.onTick(1);
 	ASSERT_TRUE(PTR_DEACTIVATING(step_states[0]));
 }
