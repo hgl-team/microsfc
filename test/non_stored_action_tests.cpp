@@ -26,65 +26,63 @@ public:
 
 class NonStoredActionTest: public testing::Test, public EventListener {
 public:
-	stateful_state_t state;
 	stateful_state_t reported_state;
 	NonStoredAction action = NonStoredAction(0);
 	MockNonStoredArtifactContainer container;
+	EventListener* listener[1];
 
 	virtual void onActivationChanged(const sfc::stateful_state_t &state) {
 		this->reported_state = state;
 	}
 
 	NonStoredActionTest() {
-		state = { 0, false, false };
+		listener[0] = this;
 		action = NonStoredAction(0);
-		action.setListeners( { this, 1 });
+		action.setListeners({ listener, 1 });
 	}
 
 	void givenAnActionWith5TickCondition() {
+		listener[0] = this;
 		action = NonStoredAction(0, active_after_5_ticks);
-		action.setListeners( { this, 1 });
+		action.setListeners({ listener, 1 });
 	}
 };
 
 TEST_F(NonStoredActionTest, actionDoesNotActivateIfStepDoesnt) {
-	EXPECT_CALL(container, getStepState(_)).Times(testing::AtLeast(1))
-		.WillOnce(::testing::ReturnRefOfCopy(inactiveState))
+	EXPECT_CALL(container, getStepState(_)).Times(1)
 		.WillOnce(::testing::ReturnRefOfCopy(inactiveState));
 
 	action.evaluate(&container);
-	action.onTick(1, &container);
+	action.onTick(1); //, &container);
 
 	ASSERT_FALSE(reported_state.active);
 	ASSERT_FALSE(reported_state.transiting);
 }
 
 TEST_F(NonStoredActionTest, actionActivatesIfStepDoes) {
-	EXPECT_CALL(container, getStepState(_)).Times(testing::AtLeast(1))
-		.WillOnce(::testing::ReturnRefOfCopy(activatedState))
-		.WillOnce(::testing::ReturnRefOfCopy(activatingState));
+	EXPECT_CALL(container, getStepState(_)).Times(1)
+		.WillOnce(::testing::ReturnRefOfCopy(activatedState));
 
 	action.evaluate(&container);
-	action.onTick(1, &container);
+	action.onTick(1); //, &container);
 
 	ASSERT_TRUE(reported_state.active);
 	ASSERT_TRUE(reported_state.transiting);
 }
 
 TEST_F(NonStoredActionTest, actionActivatesAndNotTransitingIfStepActive) {
-	EXPECT_CALL(container, getStepState(_)).Times(testing::AtLeast(2))
+	EXPECT_CALL(container, getStepState(_)).Times(2)
 		.WillOnce(testing::ReturnRefOfCopy(activatedState))
-		.WillOnce(testing::ReturnRefOfCopy(activatingState))
-		.WillRepeatedly(testing::ReturnRefOfCopy(activeState));
+		.WillOnce(testing::ReturnRefOfCopy(activatingState));
 
 	action.evaluate(&container);
-	action.onTick(1, &container);
+	action.onTick(1); //, &container);
 
 	ASSERT_TRUE(reported_state.active);
 	ASSERT_TRUE(reported_state.transiting);
 
 	action.evaluate(&container);
-	action.onTick(1, &container);
+	action.onTick(1); //, &container);
 
 	ASSERT_TRUE(reported_state.active);
 	ASSERT_FALSE(reported_state.transiting);
@@ -94,29 +92,26 @@ TEST_F(NonStoredActionTest, actionDeactivatesWhenStepDeactives) {
 	EXPECT_CALL(container, getStepState(_)).Times(testing::AtLeast(1))
 		.WillOnce(testing::ReturnRefOfCopy(activatedState))
 		.WillOnce(testing::ReturnRefOfCopy(activatingState))
-		.WillOnce(testing::ReturnRefOfCopy(activeState))
-		.WillOnce(testing::ReturnRefOfCopy(activeState))
 		.WillOnce(testing::ReturnRefOfCopy(deactivatedState))
-		.WillOnce(testing::ReturnRefOfCopy(deactivatingState))
-		.WillRepeatedly(testing::ReturnRefOfCopy(inactiveState));
+		.WillRepeatedly(testing::ReturnRefOfCopy(deactivatingState));
 
 	action.evaluate(&container);
-	action.onTick(1, &container);
+	action.onTick(1); //, &container);
 	ASSERT_TRUE(reported_state.active);
 	ASSERT_TRUE(reported_state.transiting);
 
 	action.evaluate(&container);
-	action.onTick(1, &container);
+	action.onTick(1); //, &container);
 	ASSERT_TRUE(reported_state.active);
 	ASSERT_FALSE(reported_state.transiting);
 
 	action.evaluate(&container);
-	action.onTick(1, &container);
+	action.onTick(1); //, &container);
 	ASSERT_FALSE(reported_state.active);
 	ASSERT_TRUE(reported_state.transiting);
 
 	action.evaluate(&container);
-	action.onTick(1, &container);
+	action.onTick(1); //, &container);
 	ASSERT_FALSE(reported_state.active);
 	ASSERT_FALSE(reported_state.transiting);
 }
@@ -131,14 +126,14 @@ TEST_F(NonStoredActionTest, actionActivatesAfterConditionSet) {
 
 	for (int i = 0; i < 4; i++) {
 		action.evaluate(&container);
-		action.onTick(1, &container);
+		action.onTick(1); //, &container);
 
 		ASSERT_FALSE(reported_state.active);
 		ASSERT_FALSE(reported_state.transiting);
 	}
 
 	action.evaluate(&container);
-	action.onTick(1, &container);
+	action.onTick(1); //, &container);
 
 	ASSERT_TRUE(reported_state.active);
 	ASSERT_TRUE(reported_state.transiting);
