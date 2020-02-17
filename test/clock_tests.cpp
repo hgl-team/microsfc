@@ -5,7 +5,7 @@
  *      Author: leonardo
  */
 
-#include "gtest.h"
+#include <gtest.h>
 
 #include "../src/sfctypes.h"
 #include "../src/time/Clock.h"
@@ -13,20 +13,29 @@
 
 using namespace testing;
 
-class ClockTest: public testing::Test, public sfc::ClockListener {
-public:
-	sfc::Clock clock;
-	sfc::ulong_t currentDelta;
+sfc::ulong_t currentDelta = 0;
 
-	ClockTest() {
-		clock = sfc::Clock( { this, 1 });
-		currentDelta = 0;
-	}
+class TestListener: public sfc::ClockListener {
+public:
+	TestListener() { }
+	~TestListener() { }
 
 	virtual void onTick(const sfc::ulong_t &delta) {
 		currentDelta = delta;
 	}
+};
 
+class ClockTest: public testing::Test {
+public:
+	sfc::Clock clock;
+	TestListener listener;
+	sfc::ClockListener * listeners[1];
+
+	ClockTest() {
+		listeners[0] = &listener ;
+		clock = sfc::Clock({ listeners, 1 });
+		currentDelta = 0;
+	}
 };
 
 struct clock_tick_state {

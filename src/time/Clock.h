@@ -19,7 +19,7 @@ namespace sfc {
 class Clock {
 private:
 	ulong_t current_time;
-	array<ClockListener> listeners;
+	array<ClockListener*> listeners;
 public:
 	/**
 	 *
@@ -29,13 +29,13 @@ public:
 	 * Setup a new clock with given listeners.
 	 * @param listeners array of time event listeners.
 	 */
-	Clock(const array<ClockListener> &listeners);
+	Clock(const array<ClockListener*> &listeners);
 	virtual ~Clock();
 
 	void tick(const ulong_t &time);
 
 	ulong_t getCurrentTime() const;
-	const array<ClockListener>& getListeners() const;
+	const array<ClockListener*>& getListeners() const;
 	void offset(const int & value);
 };
 

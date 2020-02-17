@@ -19,25 +19,32 @@ namespace sfc {
 
 typedef struct {
 	array<Step> steps;
-	array<Action> actions;
+	array<Action*> actions;
 	array<Transition> transitions;
 } component_context_t;
 
 class Application : public StatefulObject, public StepContext {
 private:
-	state_context_t state_context;
 	component_context_t container_context;
-
+	bool evaluate;
+	ulong_t component_delta;
 protected:
-	virtual void stateChanged(const stateful_state_t &state);
+	virtual void stateReported(const stateful_state_t &state);
+
+	virtual void evaluateStates(const sfc::ulong_t &delta);
+	virtual void performComponentTick(const sfc::ulong_t &delta);
+
+	virtual void evaluateTransitions();
+	virtual void evaluateActions();
 public:
 	Application();
-	Application(stateful_state_t * application_state, const state_context_t & state_context, const component_context_t & container_context);
+	Application(const component_context_t & container_context);
 	virtual ~Application();
 	const virtual sfc::stateful_state_t& getStepState(const int &id);
 	virtual size_t getStepCount();
 	virtual bool isEntryPoint(const int &id);
 	virtual void toggleStepState(const int &id, const bool &active);
+	virtual void onTick(const sfc::ulong_t &delta);
 };
 
 } /* namespace sfc */

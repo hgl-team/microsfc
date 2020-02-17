@@ -15,20 +15,18 @@
 
 namespace sfc {
 
-class Transition: EventListener {
+class Transition {
 private:
-	StepContext *context;
 	array<int> input_step_ids;
 	array<int> output_step_ids;
 	predicate_fnc condition;
 public:
 	Transition();
-	Transition(StepContext *context, const array<int> &input_step_ids,
-			const array<int> &output_step_ids, predicate_fnc condition);
+	Transition(const array<int> &input_step_ids,
+			const array<int> &output_step_ids, 
+			predicate_fnc condition);
 	virtual ~Transition();
-	virtual void onActivationChanged(const sfc::stateful_state_t &state);
-	predicate_fnc getCondition() const;
-	void setCondition(predicate_fnc condition);
+	virtual void onActivationChanged(StepContext * const& context);
 };
 
 } /* namespace sfc */

@@ -14,12 +14,14 @@ namespace sfc {
 
 class NonStoredAction: public Action {
 public:
-	NonStoredAction(StepContext *context, stateful_state_t *state,
-			const size_t &step_id);
+	NonStoredAction(const size_t &step_id);
+	NonStoredAction(const size_t &step_id, activation_predicate_fnc condition);
+	NonStoredAction(const size_t &step_id, array<state_handler_t> handlers);
+	NonStoredAction(const size_t &step_id, activation_predicate_fnc condition, array<state_handler_t> handlers);
 	virtual ~NonStoredAction();
 
 protected:
-	virtual bool evaluateActivation(const sfc::predicate_state_t &state);
+	bool evaluateActivation(const sfc::predicate_state_t &state) override;
 };
 
 } /* namespace sfc */

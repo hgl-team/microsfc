@@ -9,36 +9,84 @@
 
 namespace sfc {
 
-Application::Application(stateful_state_t * application_state, const state_context_t & state_context, const component_context_t & container_context)
-	: StatefulObject(application_state)
+Application::Application(const component_context_t & container_context)
+	: StatefulObject()
 {
-	this->state_context = state_context;
 	this->container_context = container_context;
+	this->component_delta = 0;
+	this->evaluate = false;
 }
 
 Application::Application() : StatefulObject() {
-	this->state_context = { {NULL, 0}, {NULL, 0}, { NULL, 0 } };
 	this->container_context = { {NULL, 0}, {NULL, 0}, { NULL, 0 } };
+	this->component_delta = 0;
+	this->evaluate = false;
 }
 
 Application::~Application() { }
 
-void Application::stateChanged(const stateful_state_t &state) {
-	if(ACTIVATING(state)) {
+void Application::stateReported(const stateful_state_t &state) {
+	
+}
+
+void Application::evaluateStates(const sfc::ulong_t &delta) {
+	this->component_delta = delta;
+
+	if(PTR_ACTIVATING(this->getState())) {
 		for(size_t i = 0; i < this->getStepCount(); i++) {
 			if(this->isEntryPoint(i)) {
 				this->toggleStepState(i, true);
 			}
 		}
-	} else if(DEACTIVATING(state)) {
+	} else if(PTR_DEACTIVATING(this->getState())) {
 		for(size_t i = 0; i < this->getStepCount(); i++) {
 			this->toggleStepState(i, false);
 		}
+	} else if(PTR_ACTIVATED(this->getState())) {
+		this->evaluateTransitions();
+		this->evaluateActions();
+	}
+}
+
+void Application::evaluateTransitions() {
+	for(size_t i = 0; i < this->container_context.transitions.size; i++) {
+		Transition * transition = (this->container_context.transitions.ptr) + i;
+		transition->onActivationChanged(this);
+	}
+}
+void Application::evaluateActions() {
+	for(size_t i = 0; i < this->container_context.actions.size; i++) {
+		Action * action = *((this->container_context.actions.ptr) + i);
+		action->evaluate(this);
+	}
+}
+
+void Application::performComponentTick(const sfc::ulong_t &delta) {
+	for(size_t i = 0; i < this->container_context.steps.size; i++) {
+		Step * step = (this->container_context.steps.ptr) + i; 
+		step->onTick(delta + component_delta);
+	}
+	for(size_t i = 0; i < this->container_context.actions.size; i++) {
+		Action * action = *ARRAY_GET(this->container_context.actions, i); 
+		action->onTick(delta + component_delta);
+		continue;
+	}
+}
+
+void Application::onTick(const sfc::ulong_t &delta) {
+	StatefulObject::onTick(delta);
+	
+	evaluate = !evaluate;
+
+	if(evaluate) {
+		evaluateStates(delta);
+	} else {
+		performComponentTick(delta);
 	}
 }
 
 const sfc::stateful_state_t& Application::getStepState(const int &id) {
-	return *(this->state_context.step_states.ptr + id);
+	return *(ARRAY_GET(this->container_context.steps, id)->getState());
 }
 
 size_t Application::getStepCount() {

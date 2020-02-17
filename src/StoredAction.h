@@ -17,12 +17,14 @@ private:
 	bool should_activate = false;
 public:
 	StoredAction();
-	StoredAction(StepContext *context, stateful_state_t *state,
-			const size_t &step_id);
+	StoredAction(const size_t &step_id);
+	StoredAction(const size_t &step_id, activation_predicate_fnc condition);
+	StoredAction(const size_t &step_id, array<state_handler_t> handlers);
+	StoredAction(const size_t &step_id, activation_predicate_fnc condition, array<state_handler_t> handlers);
 	virtual ~StoredAction();
 
 protected:
-	virtual bool evaluateActivation(const sfc::predicate_state_t &state);
+	virtual bool evaluateActivation(const sfc::predicate_state_t &state) override;
 };
 
 } /* namespace sfc */

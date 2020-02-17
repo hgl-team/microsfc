@@ -15,70 +15,78 @@
 
 using namespace sfc;
 
-stateful_state_t step_states[] = {
-		{ 0, false, false },
-		{ 0, false, false },
-		{ 0, false, false },
-};
 Step steps[3] = {
-		Step(step_states, true),
-		Step(step_states + 1, true),
-		Step(step_states + 2, true)
+	Step(true),
+	Step(true),
+	Step(true)
+};
+
+stateful_state_t * step_states[] = {
+	steps[0].getState(),
+	steps[1].getState(),
+	steps[2].getState()
 };
 
 class ApplicationTest : public testing::Test {
 public:
-	stateful_state_t application_state = { 0, false, false };
-
 	component_context_t component_context = {
 			array<Step> { steps, 3 },
-			array<Action> { NULL, 0 },
+			array<Action*> { NULL, 0 },
 			array<Transition> { NULL, 0 },
-	};
-	state_context_t state_context = {
-			array<stateful_state_t> { step_states, 3 },
-			array<stateful_state_t> { NULL, 0 },
-			array<predicate_fnc> { NULL, 0 }
 	};
 	Application application;
 
 	ApplicationTest() {
-		application = Application(&application_state, state_context, component_context);
+		application = Application(component_context);
 	}
 };
 
 TEST_F(ApplicationTest, activatesStepsWhenActivating) {
 	application.activate();
-	application.onTick(1);
 
+	application.onTick(1);
 	for(size_t i = 0; i < 3; i++) {
-		EXPECT_TRUE(ACTIVATING(step_states[i]));
+		EXPECT_TRUE(step_states[i]->activated);
+	}
+
+	application.onTick(1);
+	for(size_t i = 0; i < 3; i++) {
+		EXPECT_TRUE(PTR_ACTIVATING(step_states[i]));
 	}
 }
 
 TEST_F(ApplicationTest, deactivatesStepsWhenDeactivating) {
 	for(size_t i = 0; i < 3; i++) {
-		(step_states + i)->active = 1;
-		(step_states + i)->transiting = 0;
+		(step_states[i])->activated = 1;
+		(step_states[i])->active = 1;
+		(step_states[i])->transiting = 0;
 	}
 
-	application_state.active = true;
-	application_state.transiting = false;
+	application.getState()->activated = true;
+	application.getState()->active = true;
+	application.getState()->transiting = false;
 
 	application.shutdown();
-	application.onTick(1);
 
+	application.onTick(1);
 	for(size_t i = 0; i < 3; i++) {
-		EXPECT_TRUE(DEACTIVATING(step_states[i]));
+		EXPECT_FALSE(steps[i].getState()->activated);
+	}
+
+	application.onTick(1);
+	for(size_t i = 0; i < 3; i++) {
+		EXPECT_TRUE(PTR_DEACTIVATING(steps[i].getState()));
 	}
 }
 
 TEST_F(ApplicationTest, shutdownStepWhenToggleStepToFalse) {
-	step_states->active = 1;
-	step_states->transiting = 0;
+	step_states[0]->activated = 1;
+	step_states[0]->active = 1;
+	step_states[0]->transiting = 0;
 
 	application.toggleStepState(0, false);
-
-	ASSERT_TRUE(DEACTIVATING(step_states[0]));
+	application.onTick(1);
+	ASSERT_FALSE(step_states[0]->activated);
+	application.onTick(1);
+	ASSERT_TRUE(PTR_DEACTIVATING(step_states[0]));
 }
-

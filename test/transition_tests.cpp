@@ -5,8 +5,8 @@
  *      Author: leonardo
  */
 
-#include "gtest.h"
-#include "gmock.h"
+#include <gtest.h>
+#include <gmock/gmock.h>
 
 #include "../src/sfctypes.h"
 #include "../src/Transition.h"
@@ -27,23 +27,23 @@ class TransitionTest: public testing::Test {
 public:
 	MockTransitionArtifactContainer container;
 	Transition transition;
-
+	array<int> inputs = { input_ids, 3};
+	array<int> outputs = { input_ids, 3};
+	
 	TransitionTest() {
-		transition = Transition(&container, { input_ids, 3 }, { input_ids, 3 },
-				NULL);
 	}
 };
 
 TEST_F(TransitionTest, activationSkipWhenStepNoActiveAndConditionSet) {
 
 	EXPECT_CALL(container, getStepState(_)).Times(3).WillOnce(
-			::testing::ReturnRefOfCopy(deactivatedState)).WillRepeatedly(
+			::testing::ReturnRefOfCopy(inactiveState)).WillRepeatedly(
 			::testing::ReturnRefOfCopy(activeState));
 
 	EXPECT_CALL(container, toggleStepState(_,_)).Times(0);
 
-	transition.setCondition(predicate_always_true);
-	transition.onActivationChanged(activeState);
+	transition = Transition(inputs, outputs, predicate_always_true);
+	transition.onActivationChanged(&container);
 }
 
 TEST_F(TransitionTest, activationSkipWhenStepActiveAndConditionFalse) {
@@ -53,8 +53,8 @@ TEST_F(TransitionTest, activationSkipWhenStepActiveAndConditionFalse) {
 
 	EXPECT_CALL(container, toggleStepState(_,_)).Times(0);
 
-	transition.setCondition(predicate_always_false);
-	transition.onActivationChanged(activeState);
+	transition = Transition(inputs, outputs, predicate_always_false);
+	transition.onActivationChanged(&container);
 }
 
 TEST_F(TransitionTest, activationSetWhenStepActiveAndConditionSet) {
@@ -64,6 +64,6 @@ TEST_F(TransitionTest, activationSetWhenStepActiveAndConditionSet) {
 
 	EXPECT_CALL(container, toggleStepState(_,_)).Times(6);
 
-	transition.setCondition(predicate_always_true);
-	transition.onActivationChanged(activeState);
+	transition = Transition(inputs, outputs, predicate_always_true);
+	transition.onActivationChanged(&container);
 }

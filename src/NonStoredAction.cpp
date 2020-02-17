@@ -9,16 +9,25 @@
 
 namespace sfc {
 
-NonStoredAction::NonStoredAction(StepContext *context,
-		stateful_state_t *state, const size_t &step_id) :
-		Action(context, state, step_id) {
+NonStoredAction::NonStoredAction(const size_t &step_id) :
+		Action(step_id) {
+}
+NonStoredAction::NonStoredAction(const size_t &step_id, activation_predicate_fnc condition) :
+		Action(step_id, condition) {
+}
+
+NonStoredAction::NonStoredAction(const size_t &step_id, array<state_handler_t> handlers) :
+		Action(step_id, handlers) {
+}
+NonStoredAction::NonStoredAction(const size_t &step_id, activation_predicate_fnc condition, array<state_handler_t> handlers) :
+		Action(step_id, condition, handlers) {
 }
 
 NonStoredAction::~NonStoredAction() {
 }
 
 bool NonStoredAction::evaluateActivation(const sfc::predicate_state_t &state) {
-	return state.step_state.active;
+	return state.step_state.activated;
 }
 
 } /* namespace sfc */
