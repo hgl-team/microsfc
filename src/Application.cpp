@@ -68,7 +68,7 @@ void Application::performComponentTick(const sfc::ulong_t &delta) {
 	}
 	for(size_t i = 0; i < this->container_context.actions.size; i++) {
 		Action * action = *ARRAY_GET(this->container_context.actions, i); 
-		action->onTick(delta + component_delta, this);
+		action->onTick(delta + component_delta);
 		continue;
 	}
 }

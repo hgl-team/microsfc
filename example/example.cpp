@@ -18,11 +18,11 @@ bool transition_3();
 bool transition_4();
 bool transition_5();
 
-void action_0(const activation_state_t &state);
-void action_1(const activation_state_t &state);
-void action_2(const activation_state_t &state);
-void action_3(const activation_state_t &state);
-void action_4(const activation_state_t &state);
+void action_0(const stateful_state_t &state);
+void action_1(const stateful_state_t &state);
+void action_2(const stateful_state_t &state);
+void action_3(const stateful_state_t &state);
+void action_4(const stateful_state_t &state);
 
 void print_state();
 
@@ -44,7 +44,7 @@ Transition transitions[] = {
     Transition({(int[]){1, 5}, 2}, {(int[]){0}, 1}, transition_5),
 };
 
-action_state_handler_t handlers[] = {
+state_handler_t handlers[] = {
     { ACTION_STATE_ACTIVATING, action_0 }
     ,{ ACTION_STATE_ACTIVATING, action_1 }
     ,{ ACTION_STATE_ACTIVATING, action_2 }
@@ -65,13 +65,6 @@ array<Action*> actions = {(Action*[]){
         &action3,
         &action4
     }, 5};
-// Action actions[] = {
-//     ,
-//     NonStoredAction(1, {handlers + 1, 1}),
-//     NonStoredAction(2, {handlers + 2, 1}),
-//     NonStoredAction(3, {handlers + 3, 1}),
-//     NonStoredAction(4, {handlers + 4, 1}),
-// };
 
 component_context_t context =  {
     {steps, 6}, actions, {transitions, 6}
@@ -131,28 +124,22 @@ int main() {
     }
 }
 
-void action_0(const activation_state_t &state) {
+void action_0(const stateful_state_t &state) {
     tim[0].enable();
-    if(ACTIVATING(state.step_state)) { }
 }
-void action_1(const activation_state_t &state) {
+void action_1(const stateful_state_t &state) {
     light_state = !light_state;
-    if(ACTIVATING(state.step_state)) { }
 }
-void action_2(const activation_state_t &state) {
+void action_2(const stateful_state_t &state) {
     tim[1].enable();
-    if(ACTIVATING(state.step_state)) { }
 }
-void action_3(const activation_state_t &state) {
+void action_3(const stateful_state_t &state) {
     std::cout << "The light is on" << std::endl;
     tim[2].enable();
-
-    if(ACTIVATING(state.step_state)) { }
 }
-void action_4(const activation_state_t &state) {
+void action_4(const stateful_state_t &state) {
     std::cout << "The light is off" << std::endl;
     tim[2].enable();
-    if(ACTIVATING(state.step_state)) { }
 }
 
 
