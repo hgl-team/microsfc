@@ -114,4 +114,8 @@ void Application::toggleStepState(const int &id, const bool &active) {
 	}
 }
 
+component_context_t * const Application::getContext() {
+	return &(this->container_context);
+}
+
 } /* namespace sfc */
