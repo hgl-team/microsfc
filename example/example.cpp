@@ -42,65 +42,76 @@ void action_4(const stateful_state_t &state);
 void print_state();
 
 Step steps[] = {
-    Step(true),
-    Step(),
-    Step(),
-    Step(),
-    Step(),
-    Step()
+    Step(true),     // Q0. START
+    Step(),         // Q1. TOGGLE
+    Step(),         // Q2. WAIT_TOGGLE
+    Step(),         // Q3. TURN_ON
+    Step(),         // Q4. TURN_OFF
+    Step()          // Q5. NEXT
 };
 
 Transition transitions[] = {
-    Transition({(int[]){0}, 1}, {(int[]){1, 2}, 2}, transition_0),
-    Transition({(int[]){2}, 1}, {(int[]){3}, 1}, transition_1),
-    Transition({(int[]){2}, 1}, {(int[]){4}, 1}, transition_2),
-    Transition({(int[]){3}, 1}, {(int[]){5}, 1}, transition_3),
-    Transition({(int[]){4}, 1}, {(int[]){5}, 1}, transition_4),
-    Transition({(int[]){1, 5}, 2}, {(int[]){0}, 1}, transition_5),
+    Transition(
+        {(int[]){0}, 1},        // Current activated steps
+        {(int[]){1, 2}, 2},     // Next steps
+        transition_0),          // Transition predicate
+    Transition(
+        {(int[]){2}, 1},        
+        {(int[]){3}, 1},        
+        transition_1),          
+    Transition(                 
+        {(int[]){2}, 1},        
+        {(int[]){4}, 1},        
+        transition_2),          
+    Transition(                 
+        {(int[]){3}, 1},        
+        {(int[]){5}, 1},        
+        transition_3),          
+    Transition(                 
+        {(int[]){4}, 1},        
+        {(int[]){5}, 1},        
+        transition_4),          
+    Transition(                 
+        {(int[]){1, 5}, 2},     
+        {(int[]){0}, 1},        
+        transition_5),          
 };
 
-state_handler_t handlers[] = {
-    { ACTION_STATE_ACTIVATING, action_0 }
-    ,{ ACTION_STATE_ACTIVATING, action_1 }
-    ,{ ACTION_STATE_ACTIVATING, action_2 }
-    ,{ ACTION_STATE_ACTIVATING, action_3 }
-    ,{ ACTION_STATE_ACTIVATING, action_4 }
-};
+NonStoredAction action0 = NonStoredAction(0, {(state_handler_t[]){ 
+        { ACTION_STATE_ACTIVATING, action_0 }   // action 0 is called on activating  
+    }, 1});
+NonStoredAction action1 = NonStoredAction(1, {(state_handler_t[]){ 
+        { ACTION_STATE_ACTIVATING, action_1 }
+    }, 1});
+NonStoredAction action2 = NonStoredAction(2, {(state_handler_t[]){ 
+        { ACTION_STATE_ACTIVATING, action_2 }
+    }, 1});
+NonStoredAction action3 = NonStoredAction(3, {(state_handler_t[]){ 
+        { ACTION_STATE_ACTIVATING, action_3 }
+    }, 1});
+NonStoredAction action4 = NonStoredAction(4, {(state_handler_t[]){ 
+        { ACTION_STATE_ACTIVATING, action_4 }
+    }, 1});
 
-NonStoredAction action0 = NonStoredAction(0, {handlers, 1});
-NonStoredAction action1 = NonStoredAction(1, {handlers + 1, 1});
-NonStoredAction action2 = NonStoredAction(2, {handlers + 2, 1});
-NonStoredAction action3 = NonStoredAction(3, {handlers + 3, 1});
-NonStoredAction action4 = NonStoredAction(4, {handlers + 4, 1});
+Action* actions[] = { &action0, &action1, &action2, &action3, &action4 } ;
 
-array<Action*> actions = {(Action*[]){ 
-        &action0,
-        &action1,
-        &action2,
-        &action3,
-        &action4
-    }, 5};
+Application app = Application({
+    {steps, 6}, 
+    {actions, 5}, 
+    {transitions, 6}
+});
 
-component_context_t context =  {
-    {steps, 6}, actions, {transitions, 6}
-};
+Timer tim1 = Timer(1000, false);
+Timer tim2 = Timer(1000, false);
+Timer tim3 = Timer(1000, false);
 
-Timer tim[] = {
-    Timer(1000, false),
-    Timer(1000, false),
-    Timer(1000, false)
-};
-
-Application app = Application(context);
-
-ClockListener * listeners[] = {
+Clock theClock = Clock({(ClockListener*[]) {
     &app,
-    tim, 
-    tim + 1, 
-    tim + 2
-};
+    &tim1, 
+    &tim2, 
+    &tim3
+}, 4});
 
-Clock theClock = Clock({listeners, 4});
 bool light_state = false;
 
 void *tickClock(void *value) {
@@ -140,38 +151,38 @@ int main() {
 }
 
 void action_0(const stateful_state_t &state) {
-    tim[0].enable();
+    tim1.enable();
 }
 void action_1(const stateful_state_t &state) {
     light_state = !light_state;
 }
 void action_2(const stateful_state_t &state) {
-    tim[1].enable();
+    tim2.enable();
 }
 void action_3(const stateful_state_t &state) {
     std::cout << "The light is on" << std::endl;
-    tim[2].enable();
+    tim3.enable();
 }
 void action_4(const stateful_state_t &state) {
     std::cout << "The light is off" << std::endl;
-    tim[2].enable();
+    tim3.enable();
 }
 
 
 bool transition_0() {
-    return tim->getState()->interrupted;
+    return tim1.getState()->interrupted;
 }
 bool transition_1() {
-    return (tim + 1)->getState()->interrupted && light_state;
+    return tim2.getState()->interrupted && light_state;
 }
 bool transition_2() {
-    return (tim + 1)->getState()->interrupted && !light_state;
+    return tim2.getState()->interrupted && !light_state;
 }
 bool transition_3() {
-    return (tim + 2)->getState()->interrupted;
+    return tim3.getState()->interrupted;
 }
 bool transition_4() {
-    return (tim + 2)->getState()->interrupted;
+    return tim3.getState()->interrupted;
 }
 bool transition_5() {
     true;
@@ -184,10 +195,10 @@ void print_state() {
        changed = changed || PTR_ACTIVATING(steps[i].getState()) || PTR_DEACTIVATING(steps[i].getState());
    }
 
-   for(size_t i = 0; i < actions.size; i++) {
+   for(size_t i = 0; i < app.getContext()->actions.size; i++) {
         changed = changed 
-            || PTR_ACTIVATING((*ARRAY_GET(actions, i))->getState()) 
-            || PTR_DEACTIVATING((*ARRAY_GET(actions, i))->getState());
+            || PTR_ACTIVATING((*ARRAY_GET(app.getContext()->actions, i))->getState()) 
+            || PTR_DEACTIVATING((*ARRAY_GET(app.getContext()->actions, i))->getState());
    }
 
     if(changed) {
@@ -200,17 +211,9 @@ void print_state() {
 
         std::cout << "   A: ";
 
-        for(size_t i = 0; i < actions.size; i++) {
-            const char * flag = (*ARRAY_GET(actions, i))->getState()->active ? "|O|" : "|_|";
+        for(size_t i = 0; i < app.getContext()->actions.size; i++) {
+            const char * flag = (*ARRAY_GET(app.getContext()->actions, i))->getState()->active ? "|O|" : "|_|";
             std::cout << flag;
-        }
-
-        std::cout << "    T: ";
-
-        for(size_t i = 0; i < 3; i++) {
-            Timer * t = tim + i;
-            timer_state_t * state = t->getState();
-            std::cout << "|" << (state->current_time) << "|";
         }
 
         std::cout << std::endl;

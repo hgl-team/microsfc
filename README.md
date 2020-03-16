@@ -33,21 +33,39 @@ next we declate the steps and actions
 
 ``` cpp
 Step steps[] = {
-    Step(true),
-    Step(),
-    Step(),
-    Step(),
-    Step(),
-    Step()
+    Step(true),     // Q0. START
+    Step(),         // Q1. TOGGLE
+    Step(),         // Q2. WAIT_TOGGLE
+    Step(),         // Q3. TURN_ON
+    Step(),         // Q4. TURN_OFF
+    Step()          // Q5. NEXT
 };
 
 Transition transitions[] = {
-    Transition({(int[]){0}, 1}, {(int[]){1, 2}, 2}, transition_0),
-    Transition({(int[]){2}, 1}, {(int[]){3}, 1}, transition_1),
-    Transition({(int[]){2}, 1}, {(int[]){4}, 1}, transition_2),
-    Transition({(int[]){3}, 1}, {(int[]){5}, 1}, transition_3),
-    Transition({(int[]){4}, 1}, {(int[]){5}, 1}, transition_4),
-    Transition({(int[]){1, 5}, 2}, {(int[]){0}, 1}, transition_5),
+    Transition(
+        {(int[]){0}, 1},        // Current activated steps
+        {(int[]){1, 2}, 2},     // Next steps
+        transition_0),          // Transition predicate
+    Transition(
+        {(int[]){2}, 1},        
+        {(int[]){3}, 1},        
+        transition_1),          
+    Transition(                 
+        {(int[]){2}, 1},        
+        {(int[]){4}, 1},        
+        transition_2),          
+    Transition(                 
+        {(int[]){3}, 1},        
+        {(int[]){5}, 1},        
+        transition_3),          
+    Transition(                 
+        {(int[]){4}, 1},        
+        {(int[]){5}, 1},        
+        transition_4),          
+    Transition(                 
+        {(int[]){1, 5}, 2},     
+        {(int[]){0}, 1},        
+        transition_5),          
 };
 ```
 
@@ -55,63 +73,52 @@ Then we declare the action handlers and the action objects. We create an array w
 
 ```cpp
 
-state_handler_t handlers[] = {
-    { ACTION_STATE_ACTIVATING, action_0 }
-    ,{ ACTION_STATE_ACTIVATING, action_1 }
-    ,{ ACTION_STATE_ACTIVATING, action_2 }
-    ,{ ACTION_STATE_ACTIVATING, action_3 }
-    ,{ ACTION_STATE_ACTIVATING, action_4 }
-};
+NonStoredAction action0 = NonStoredAction(0, {(state_handler_t[]){ 
+        { ACTION_STATE_ACTIVATING, action_0 }   // action 0 is called on activating  
+    }, 1});
+NonStoredAction action1 = NonStoredAction(1, {(state_handler_t[]){ 
+        { ACTION_STATE_ACTIVATING, action_1 }
+    }, 1});
+NonStoredAction action2 = NonStoredAction(2, {(state_handler_t[]){ 
+        { ACTION_STATE_ACTIVATING, action_2 }
+    }, 1});
+NonStoredAction action3 = NonStoredAction(3, {(state_handler_t[]){ 
+        { ACTION_STATE_ACTIVATING, action_3 }
+    }, 1});
+NonStoredAction action4 = NonStoredAction(4, {(state_handler_t[]){ 
+        { ACTION_STATE_ACTIVATING, action_4 }
+    }, 1});
 
-NonStoredAction action0 = NonStoredAction(0, {handlers, 1});
-NonStoredAction action1 = NonStoredAction(1, {handlers + 1, 1});
-NonStoredAction action2 = NonStoredAction(2, {handlers + 2, 1});
-NonStoredAction action3 = NonStoredAction(3, {handlers + 3, 1});
-NonStoredAction action4 = NonStoredAction(4, {handlers + 4, 1});
-
-array<Action*> actions = {(Action*[]){ 
-        &action0,
-        &action1,
-        &action2,
-        &action3,
-        &action4
-    }, 5};
+Action* actions[] = { &action0, &action1, &action2, &action3, &action4 } ;
 ```
 
-We must create the component context, which will hold the steps, transitions and actions. 
+Finaly we create our application. We define a context that holds the steps, transitions and actions and pass it through the Application constructor.
 
 ```cpp
-component_context_t context =  {
-    {steps, 6}, actions, {transitions, 6}
-};
+Application app = Application({
+    {steps, 6}, 
+    {actions, 5}, 
+    {transitions, 6}
+});
 ```
 
-Finaly we create our application using that context.
+We must define three timers in this example.
 
 ```cpp
-Application app = Application(context);
+Timer tim1 = Timer(1000, false);
+Timer tim2 = Timer(1000, false);
+Timer tim3 = Timer(1000, false);
 ```
 
-We need three timers in this example.
+The application works as a time-event-based component. So we must define a clock and register the application within it. We must register the timers of this example in this clock too.
 
 ```cpp
-Timer tim[] = {
-    Timer(1000, false),
-    Timer(1000, false),
-    Timer(1000, false)
-};
-```
-
-The application works as a time-event-based component. So we must define a clock and register the application within it. We must register the timers of this example to this clock too.
-
-```cpp
-ClockListener * listeners[] = {
+Clock theClock = Clock({(ClockListener*[]) {
     &app,
-    tim, 
-    tim + 1, 
-    tim + 2
-};
-Clock theClock = Clock({listeners, 4});
+    &tim1, 
+    &tim2, 
+    &tim3
+}, 4});
 ```
 
 The clock ticks every time the system performs a loop. In order to trigger the time-event based components we must provide the system time in milliseconds. 
