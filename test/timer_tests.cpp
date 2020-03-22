@@ -4,11 +4,11 @@
  *  Created on: 23/11/2019
  *      Author: leonardo
  */
-#include <gtest.h>
+#include <gtest/gtest.h>
 
-#include "../src/sfctypes.h"
-#include "../src/time/Timer.h"
-#include "../src/time/ClockListener.h"
+#include "sfctypes.h"
+#include "Timer.h"
+#include "ClockListener.h"
 
 using namespace sfc;
 

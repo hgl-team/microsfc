@@ -13,13 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include <gtest.h>
+#include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "../src/sfctypes.h"
-#include "../src/NonStoredAction.h"
-#include "../test/test_stubs.h"
-#include "../src/StepContext.h"
+#include "sfctypes.h"
+#include "NonStoredAction.h"
+#include "test_stubs.h"
+#include "StepContext.h"
 
 using namespace sfc;
 using testing::_;

@@ -21,33 +21,33 @@ Action::Action() :
 		StatefulObject() {
 	this->step_id = 0;
 	this->condition = NULL;
-	this->condition_state = StatefulObject();
+	this->condition_state = { 0, false, false, false };
 }
 
 Action::Action(const size_t &step_id) :
 		StatefulObject() {
 	this->step_id = step_id;
 	this->condition = NULL;
-	this->condition_state = StatefulObject();
+	this->condition_state = { 0, false, false, false };
 }
 Action::Action(const size_t &step_id, activation_predicate_fnc condition) :
 		StatefulObject() {
 	this->step_id = step_id;
 	this->condition = condition;
-	this->condition_state = StatefulObject();
+	this->condition_state = { 0, false, false, false };
 }
 
 Action::Action(const size_t &step_id, array<state_handler_t> handlers) 
 		: StatefulObject(handlers) {
 	this->step_id = step_id;
 	this->condition = NULL;
-	this->condition_state = StatefulObject();
+	this->condition_state = { 0, false, false, false };
 }
 Action::Action(const size_t &step_id, activation_predicate_fnc condition, array<state_handler_t> handlers)
 		: StatefulObject(handlers) {
 	this->step_id = step_id;
 	this->condition = condition;
-	this->condition_state = StatefulObject();
+	this->condition_state = { 0, false, false, false };
 }
 
 Action::~Action() { }
@@ -67,17 +67,22 @@ void Action::evaluate(StepContext * const& context) {
 	// Evaluate the action-specific predicate.
 	bool activation = this->evaluateActivation(predicate_state);
 	
-	if(condition && activation) {
-		this->condition_state.activate();
-	} else {
-		this->condition_state.shutdown();
-	}
+	this->condition_state.activated = condition && activation;
 
-	if (PTR_ACTIVATED(this->condition_state.getState()) && !PTR_ACTIVATED(this->getState())) {
+	if (this->condition_state.activated && !this->getState()->activated) {
 		this->activate();
-	} else if (!PTR_ACTIVATED(this->condition_state.getState()) && PTR_ACTIVATED(this->getState())) {
+	} else if (!this->condition_state.activated && this->getState()->activated) {
 		this->shutdown();
 	}
+}
+
+void Action::onTick(const sfc::time_t &delta) { 
+	StatefulObject::onTick(delta);
+	stateful_on_tick(this->condition_state, delta);
+}
+
+const stateful_state_t & Action::getConditionState() {
+	return this->condition_state;
 }
 
 } /* namespace sfc */

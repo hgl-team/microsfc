@@ -26,21 +26,21 @@ Timer::Timer() {
 Timer::~Timer() {
 }
 
-Timer::Timer(const ulong_t &period, const bool &continous) {
+Timer::Timer(const time_t &period, const bool &continous) {
 	this->period = period;
 	this->continous = continous;
 	this->timer_state = {0, false, false};
 }
 
-Timer::Timer(const ulong_t &period) {
+Timer::Timer(const time_t &period) {
 	this->period = period;
 	this->continous = false;
 	this->timer_state = {0, false, false};
 }
 
-void Timer::onTick(const sfc::ulong_t &delta) {
+void Timer::onTick(const sfc::time_t &delta) {
 	if (this->timer_state.enabled) {
-		ulong_t elapsed_time = this->timer_state.current_time + delta;
+		time_t elapsed_time = this->timer_state.current_time + delta;
 		this->timer_state.current_time = elapsed_time % (this->period);
 		this->timer_state.interrupted = elapsed_time >= this->period;
 		this->timer_state.enabled = this->timer_state.enabled

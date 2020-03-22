@@ -5,14 +5,14 @@
  *      Author: leonardo
  */
 
-#include <gtest.h>
+#include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "../src/sfctypes.h"
-#include "../src/time/Timer.h"
-#include "../src/time/ClockListener.h"
-#include "../src/StoredAction.h"
-#include "../test/test_stubs.h"
+#include "sfctypes.h"
+#include "Timer.h"
+#include "ClockListener.h"
+#include "StoredAction.h"
+#include "test_stubs.h"
 
 using namespace sfc;
 using testing::_;

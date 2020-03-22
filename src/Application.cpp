@@ -37,7 +37,7 @@ void Application::stateReported(const stateful_state_t &state) {
 	
 }
 
-void Application::evaluateStates(const sfc::ulong_t &delta) {
+void Application::evaluateStates(const sfc::time_t &delta) {
 	this->component_delta = delta;
 
 	if(PTR_ACTIVATING(this->getState())) {
@@ -69,7 +69,7 @@ void Application::evaluateActions() {
 	}
 }
 
-void Application::performComponentTick(const sfc::ulong_t &delta) {
+void Application::performComponentTick(const sfc::time_t &delta) {
 	for(size_t i = 0; i < this->container_context.steps.size; i++) {
 		Step * step = (this->container_context.steps.ptr) + i; 
 		step->onTick(delta + component_delta);
@@ -81,7 +81,7 @@ void Application::performComponentTick(const sfc::ulong_t &delta) {
 	}
 }
 
-void Application::onTick(const sfc::ulong_t &delta) {
+void Application::onTick(const sfc::time_t &delta) {
 	StatefulObject::onTick(delta);
 	
 	evaluate = !evaluate;

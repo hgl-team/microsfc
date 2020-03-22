@@ -26,7 +26,7 @@ class Action: public StatefulObject {
 private:
 	size_t step_id;
 	activation_predicate_fnc condition;
-	StatefulObject condition_state;
+	stateful_state_t condition_state;
 protected:
 	virtual bool evaluateActivation(const sfc::predicate_state_t &state);
 public:
@@ -38,7 +38,9 @@ public:
 	virtual ~Action();
 
 	virtual void evaluate(StepContext * const& context);
+	virtual void onTick(const sfc::time_t &delta);
 
+	const stateful_state_t & getConditionState();
 	size_t getStepId();
 };
 

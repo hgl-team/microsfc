@@ -13,24 +13,40 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#ifndef TIME_CLOCKLISTENER_H_
-#define TIME_CLOCKLISTENER_H_
+#ifndef TIME_CLOCK_H_
+#define TIME_CLOCK_H_
 
-#include "../sfctypes.h"
+#include "sfctypes.h"
+#include "ClockListener.h"
 
 namespace sfc {
 
-class ClockListener {
+/**
+ * Handles time events.
+ */
+class Clock {
+private:
+	sfc::time_t current_time;
+	array<ClockListener*> listeners;
 public:
-	ClockListener() { }
-	virtual ~ClockListener() { }
 	/**
-	 * Invoked when clock raises a new time event.
-	 * @param delta Time elapsed since last time event.
+	 *
 	 */
-	virtual void onTick(const ulong_t &delta) { }
+	Clock();
+	/**
+	 * Setup a new clock with given listeners.
+	 * @param listeners array of time event listeners.
+	 */
+	Clock(const array<ClockListener*> &listeners);
+	virtual ~Clock();
+
+	void tick(const sfc::time_t &time);
+
+	const sfc::time_t getCurrentTime() const;
+	const array<ClockListener*>& getListeners() const;
+	void offset(const int & value);
 };
 
 } /* namespace sfc */
 
-#endif /* TIME_CLOCKLISTENER_H_ */
+#endif /* TIME_CLOCK_H_ */

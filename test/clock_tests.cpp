@@ -13,22 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include <gtest.h>
+#include <gtest/gtest.h>
 
-#include "../src/sfctypes.h"
-#include "../src/time/Clock.h"
-#include "../src/time/ClockListener.h"
+#include "sfctypes.h"
+#include "Clock.h"
+#include "ClockListener.h"
 
 using namespace testing;
 
-sfc::ulong_t currentDelta = 0;
+sfc::time_t currentDelta = 0;
 
 class TestListener: public sfc::ClockListener {
 public:
 	TestListener() { }
 	~TestListener() { }
 
-	virtual void onTick(const sfc::ulong_t &delta) {
+	virtual void onTick(const sfc::time_t &delta) {
 		currentDelta = delta;
 	}
 };
@@ -47,9 +47,9 @@ public:
 };
 
 struct clock_tick_state {
-	sfc::ulong_t initial_time;
-	sfc::ulong_t elapsed_time;
-	sfc::ulong_t expected_delta;
+	sfc::time_t initial_time;
+	sfc::time_t elapsed_time;
+	sfc::time_t expected_delta;
 };
 
 class ClockTickTest: public ClockTest, public testing::WithParamInterface<

@@ -13,40 +13,32 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#ifndef TIME_CLOCK_H_
-#define TIME_CLOCK_H_
+#ifndef TIME_TIMER_H_
+#define TIME_TIMER_H_
 
-#include "../sfctypes.h"
 #include "ClockListener.h"
 
 namespace sfc {
 
-/**
- * Handles time events.
- */
-class Clock {
+class Timer: public ClockListener {
 private:
-	ulong_t current_time;
-	array<ClockListener*> listeners;
+	sfc::time_t period;
+	bool continous;
+	timer_state_t timer_state;
 public:
-	/**
-	 *
-	 */
-	Clock();
-	/**
-	 * Setup a new clock with given listeners.
-	 * @param listeners array of time event listeners.
-	 */
-	Clock(const array<ClockListener*> &listeners);
-	virtual ~Clock();
+	Timer();
+	Timer(const sfc::time_t &period, const bool &continous);
+	Timer(const sfc::time_t &period);
+	virtual ~Timer();
 
-	void tick(const ulong_t &time);
-
-	ulong_t getCurrentTime() const;
-	const array<ClockListener*>& getListeners() const;
-	void offset(const int & value);
+	virtual void onTick(const sfc::time_t &time);
+	
+	virtual void enable();
+	virtual void reset();
+	virtual void disable();
+	virtual timer_state_t * getState();
 };
 
 } /* namespace sfc */
 
-#endif /* TIME_CLOCK_H_ */
+#endif /* TIME_TIMER_H_ */
