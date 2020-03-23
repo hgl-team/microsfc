@@ -17,6 +17,13 @@ limitations under the License.
 
 namespace sfc {
 
+void stateful_on_tick(stateful_state_t & state, const sfc::time_t & delta) {
+	state.transiting = (state.activated) ^ (state.active);
+	state.active = state.activated;
+	state.active_time = state.active && state.transiting ? 0 : state.active_time;
+	state.active_time += state.active ? delta : 0;
+}
+
 StatefulObject::~StatefulObject() {
 }
 
@@ -76,12 +83,8 @@ void StatefulObject::reportState(const stateful_state_t &state, EventListener *c
 	listener->onActivationChanged(state);
 }
 
-void StatefulObject::onTick(const sfc::ulong_t &delta) {
-	this->state.transiting = (this->state.activated) ^ (this->state.active);
-	this->state.active = this->state.activated;
-	this->state.active_time =
-			(!(this->state.active) || ACTIVATING(this->state)) ?
-					this->state.active_time : this->state.active_time + delta;
+void StatefulObject::onTick(const sfc::time_t &delta) {
+	stateful_on_tick(this->state, delta);
 	this->reportState(this->state);
 }
 

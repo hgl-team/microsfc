@@ -117,8 +117,8 @@ bool light_state = false;
 void *tickClock(void *value) {
     
     do {
-        ulong_t clocks = std::clock();
-        ulong_t systicks_ms = (ulong_t)(clocks / (CLOCKS_PER_SEC / 10000)); 
+        sfc::time_t clocks = (sfc::time_t) std::clock();
+        sfc::time_t systicks_ms = (sfc::time_t)(clocks / (CLOCKS_PER_SEC / 10000)); 
 
         theClock.tick(systicks_ms);
         print_state();

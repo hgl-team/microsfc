@@ -13,32 +13,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#ifndef TIME_TIMER_H_
-#define TIME_TIMER_H_
+#ifndef TIME_CLOCKLISTENER_H_
+#define TIME_CLOCKLISTENER_H_
 
-#include "ClockListener.h"
+#include "sfctypes.h"
 
 namespace sfc {
 
-class Timer: public ClockListener {
-private:
-	ulong_t period;
-	bool continous;
-	timer_state_t timer_state;
+class ClockListener {
 public:
-	Timer();
-	Timer(const ulong_t &period, const bool &continous);
-	Timer(const ulong_t &period);
-	virtual ~Timer();
-
-	virtual void onTick(const sfc::ulong_t &time);
-
-	virtual void enable();
-	virtual void reset();
-	virtual void disable();
-	virtual timer_state_t * getState();
+	ClockListener() { }
+	virtual ~ClockListener() { }
+	/**
+	 * Invoked when clock raises a new time event.
+	 * @param delta Time elapsed since last time event.
+	 */
+	virtual void onTick(const sfc::time_t &delta) { }
 };
 
 } /* namespace sfc */
 
-#endif /* TIME_TIMER_H_ */
+#endif /* TIME_CLOCKLISTENER_H_ */

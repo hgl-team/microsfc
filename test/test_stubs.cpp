@@ -8,7 +8,7 @@
 #ifndef TEST_STUBS_CPP
 #define TEST_STUBS_CPP
 
-#include "../test/test_stubs.h"
+#include "test_stubs.h"
 
 const stateful_state_t inactiveState = { 1, false, false, false };
 const stateful_state_t activatedState = { 0, true, false, false };

@@ -13,12 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "gtest.h"
-#include "gmock.h"
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
-#include "../src/sfctypes.h"
-#include "../src/Application.h"
-#include "../src/Step.h"
+#include "sfctypes.h"
+#include "Application.h"
+#include "Step.h"
 #include "test_stubs.h"
 
 using namespace sfc;

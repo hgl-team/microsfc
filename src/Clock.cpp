@@ -22,12 +22,12 @@ Clock::Clock(const array<ClockListener*> &listeners) {
 	this->current_time = 0;
 }
 
-ulong_t Clock::getCurrentTime() const {
+const sfc::time_t Clock::getCurrentTime() const {
 	return current_time;
 }
 
-void Clock::tick(const ulong_t &time) {
-	ulong_t delta =
+void Clock::tick(const sfc::time_t &time) {
+	sfc::time_t delta =
 			(this->current_time < time) ?
 					time - this->current_time :
 					(ULONG_MAX - this->current_time + 1) + time;

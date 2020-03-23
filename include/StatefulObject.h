@@ -16,10 +16,12 @@ limitations under the License.
 #ifndef STATEFULOBJECT_H_
 #define STATEFULOBJECT_H_
 
-#include "time/ClockListener.h"
+#include "ClockListener.h"
 #include "EventListener.h"
 
 namespace sfc {
+
+void stateful_on_tick(stateful_state_t & state, const sfc::time_t & delta);
 
 class StatefulObject: public ClockListener {
 private:
@@ -37,7 +39,7 @@ public:
 	StatefulObject(array<state_handler_t> const& handlers);
 	virtual ~StatefulObject();
 
-	virtual void onTick(const sfc::ulong_t &delta);
+	virtual void onTick(const sfc::time_t &delta);
 	virtual void activate();
 	virtual void shutdown();
 
