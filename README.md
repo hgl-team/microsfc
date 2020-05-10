@@ -1,7 +1,6 @@
 # microsfc
 Create a simple C++ program directly from a sequential function chart using microsfc.
 
-
 ## motivation
 __*microsfc*__ were built as the core library of an automation project using Arduino based PLC's. We took advantage of C++ language syntax to create an automation program keeping the basic concepts of SFC. We successfuly used this library to implement the complex routines of an injection molding machine directly from a sequential function chart. 
 
