@@ -12,7 +12,6 @@ In this example we implemented the program below
 ![](example.png)
 
 ### Setting up variables
-
 First we declare the transition predicates and the action functions. 
 
 ``` cpp
