@@ -20,13 +20,17 @@ limitations under the License.
 
 namespace sfc {
 
+typedef void (*timer_interrupt_callback_t)(const sfc::time_t &time);
+
 class Timer: public ClockListener {
 private:
 	sfc::time_t period;
 	bool continous;
 	timer_state_t timer_state;
+	timer_interrupt_callback_t interrupt_callback;
 public:
 	Timer();
+	Timer(const sfc::time_t &period, const bool &continous, timer_interrupt_callback_t interrput_callback);
 	Timer(const sfc::time_t &period, const bool &continous);
 	Timer(const sfc::time_t &period);
 	virtual ~Timer();
@@ -37,6 +41,7 @@ public:
 	virtual void reset();
 	virtual void disable();
 	virtual timer_state_t * getState();
+	virtual void setInterruptCallback(timer_interrupt_callback_t interrupt_callback);
 };
 
 } /* namespace sfc */
