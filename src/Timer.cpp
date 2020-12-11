@@ -21,26 +21,37 @@ Timer::Timer() {
 	this->period = period;
 	this->continous = continous;
 	this->timer_state = { 0, false, false };
+	this->interrupt_callback = 0;
 }
 
 Timer::~Timer() {
+}
+
+Timer::Timer(const time_t &period, const bool &continous, timer_interrupt_callback_t interrput_callback) {
+	this->period = period;
+	this->continous = continous;
+	this->timer_state = {0, false, false};
+	this->interrupt_callback = interrupt_callback;
 }
 
 Timer::Timer(const time_t &period, const bool &continous) {
 	this->period = period;
 	this->continous = continous;
 	this->timer_state = {0, false, false};
+	this->interrupt_callback = 0;
 }
 
 Timer::Timer(const time_t &period) {
 	this->period = period;
 	this->continous = false;
 	this->timer_state = {0, false, false};
+	this->interrupt_callback = 0;
 }
 
 void Timer::onTick(const sfc::time_t &delta) {
+	time_t elapsed_time = this->timer_state.current_time + delta;
+	
 	if (this->timer_state.enabled) {
-		time_t elapsed_time = this->timer_state.current_time + delta;
 		this->timer_state.current_time = elapsed_time % (this->period);
 		this->timer_state.interrupted = elapsed_time >= this->period;
 		this->timer_state.enabled = this->timer_state.enabled
@@ -48,6 +59,9 @@ void Timer::onTick(const sfc::time_t &delta) {
 	}
 	if(this->timer_state.interrupted) {
 		this->timer_state.interrupted = true;
+		if(this->interrupt_callback != 0) {
+			this->interrupt_callback(elapsed_time);
+		}
 	}
 }
 
@@ -69,6 +83,10 @@ void Timer::disable() {
 
 timer_state_t * Timer::getState() {
 	return &(this->timer_state);
+}
+
+void Timer::setInterruptCallback(timer_interrupt_callback_t interrupt_callback) {
+	this->interrupt_callback = interrupt_callback;
 }
 
 } /* namespace sfc */
