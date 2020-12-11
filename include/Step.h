@@ -13,27 +13,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "Step.h"
+#ifndef STEP_H_
+#define STEP_H_
+
+#include "StatefulObject.h"
 
 namespace sfc {
 
-Step::Step() : StatefulObject() {
-	this->entry_point = false;
-}
-
-Step::Step(bool entry_point) : StatefulObject() {
-	this->entry_point = entry_point;
-}
-
-bool Step::isEntryPoint() const {
-	return entry_point;
-}
-
-void Step::setEntryPoint(bool entryPoint) {
-	entry_point = entryPoint;
-}
-
-Step::~Step() {
-}
+class Step: public StatefulObject {
+private:
+	bool entry_point;
+public:
+	Step();
+	Step(bool entry_point);
+	virtual ~Step();
+	virtual bool isEntryPoint() const;
+	virtual void setEntryPoint(bool entryPoint);
+};
 
 } /* namespace sfc */
+
+#endif /* STEP_H_ */

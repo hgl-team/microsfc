@@ -13,27 +13,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "Step.h"
+#ifndef TIME_CLOCKLISTENER_H_
+#define TIME_CLOCKLISTENER_H_
+
+#include "sfctypes.h"
 
 namespace sfc {
 
-Step::Step() : StatefulObject() {
-	this->entry_point = false;
-}
-
-Step::Step(bool entry_point) : StatefulObject() {
-	this->entry_point = entry_point;
-}
-
-bool Step::isEntryPoint() const {
-	return entry_point;
-}
-
-void Step::setEntryPoint(bool entryPoint) {
-	entry_point = entryPoint;
-}
-
-Step::~Step() {
-}
+class ClockListener {
+public:
+	ClockListener() { }
+	virtual ~ClockListener() { }
+	/**
+	 * Invoked when clock raises a new time event.
+	 * @param delta Time elapsed since last time event.
+	 */
+	virtual void onTick(const sfc::time_t &delta) { }
+};
 
 } /* namespace sfc */
+
+#endif /* TIME_CLOCKLISTENER_H_ */

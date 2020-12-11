@@ -1,10 +1,18 @@
 /*
- * Application.h
- *
- *  Created on: 24/11/2019
- *      Author: leonardo
- */
+Copyright 2020 Jerson Leonardo Huerfano Romero
 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
 
@@ -27,12 +35,12 @@ class Application : public StatefulObject, public StepContext {
 private:
 	component_context_t container_context;
 	bool evaluate;
-	ulong_t component_delta;
+	sfc::time_t component_delta;
 protected:
 	virtual void stateReported(const stateful_state_t &state);
 
-	virtual void evaluateStates(const sfc::ulong_t &delta);
-	virtual void performComponentTick(const sfc::ulong_t &delta);
+	virtual void evaluateStates(const sfc::time_t &delta);
+	virtual void performComponentTick(const sfc::time_t &delta);
 
 	virtual void evaluateTransitions();
 	virtual void evaluateActions();
@@ -44,7 +52,9 @@ public:
 	virtual size_t getStepCount();
 	virtual bool isEntryPoint(const int &id);
 	virtual void toggleStepState(const int &id, const bool &active);
-	virtual void onTick(const sfc::ulong_t &delta);
+	virtual void onTick(const sfc::time_t &delta);
+	
+	virtual component_context_t * const getContext();
 };
 
 } /* namespace sfc */

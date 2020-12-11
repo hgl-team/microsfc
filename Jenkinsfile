@@ -5,18 +5,16 @@ pipeline{
             steps{
                 echo "============ building microsfc"
                 sh 'mkdir -p build'
-                sh 'g++ -g $(find -type f -iregex \'.*/src/.*\\.cpp\') $(find -type f -iregex \'.*/test/.*\\.cpp\') -o build/microsfc-test.out -I /usr/include -I /usr/local/include/gtest -I /usr/local/include/gmock -I . -L/usr/local/lib/ -lgtest -lgtest_main -lgmock -lpthread -lgcov -fprofile-arcs -ftest-coverage'
+                sh 'rm -rf build/*'
+                sh '(cd build && cmake ..)'
+                sh '(cd build && make)'
             }
         }
         stage("Test") {
             steps {
                 echo "============ testing  microsfc"
-                sh 'build/microsfc-test.out --gtest_output="xml:build/microsfc_test_report.xml"'
+                sh '(cd build && ctest --verbose)'
                 sh 'gcovr --gcov-exclude=".*gtest.*"  --gcov-exclude=".*test.*" --gcov-exclude=".*example.*" -x -d > coverage.xml'
-                echo "============ cleaning "
-                sh 'ls *.gcno | xargs -L1 -I{} mv {} build/'
-                sh 'ls *.gcda | xargs -L1 -I{} mv {} build/'
-                sh 'ls *.gcov | xargs -L1 -I{} mv {} build/'
             }
         }
     }

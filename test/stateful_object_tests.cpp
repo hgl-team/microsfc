@@ -5,11 +5,11 @@
  *      Author: leonardo
  */
 
-#include <gtest.h>
+#include <gtest/gtest.h>
 
-#include "../src/sfctypes.h"
-#include "../src/time/ClockListener.h"
-#include "../src/StatefulObject.h"
+#include "sfctypes.h"
+#include "ClockListener.h"
+#include "StatefulObject.h"
 
 using namespace sfc;
 

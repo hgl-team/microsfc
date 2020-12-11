@@ -1,10 +1,18 @@
 /*
- * Application.cpp
- *
- *  Created on: 24/11/2019
- *      Author: leonardo
- */
+Copyright 2020 Jerson Leonardo Huerfano Romero
 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 #include "Application.h"
 
 namespace sfc {
@@ -29,7 +37,7 @@ void Application::stateReported(const stateful_state_t &state) {
 	
 }
 
-void Application::evaluateStates(const sfc::ulong_t &delta) {
+void Application::evaluateStates(const sfc::time_t &delta) {
 	this->component_delta = delta;
 
 	if(PTR_ACTIVATING(this->getState())) {
@@ -61,7 +69,7 @@ void Application::evaluateActions() {
 	}
 }
 
-void Application::performComponentTick(const sfc::ulong_t &delta) {
+void Application::performComponentTick(const sfc::time_t &delta) {
 	for(size_t i = 0; i < this->container_context.steps.size; i++) {
 		Step * step = (this->container_context.steps.ptr) + i; 
 		step->onTick(delta + component_delta);
@@ -73,7 +81,7 @@ void Application::performComponentTick(const sfc::ulong_t &delta) {
 	}
 }
 
-void Application::onTick(const sfc::ulong_t &delta) {
+void Application::onTick(const sfc::time_t &delta) {
 	StatefulObject::onTick(delta);
 	
 	evaluate = !evaluate;
@@ -104,6 +112,10 @@ void Application::toggleStepState(const int &id, const bool &active) {
 	} else {
 		(this->container_context.steps.ptr + id)->shutdown();
 	}
+}
+
+component_context_t * const Application::getContext() {
+	return &(this->container_context);
 }
 
 } /* namespace sfc */

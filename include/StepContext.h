@@ -13,27 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "Step.h"
+#ifndef STEPCONTEXT_H_
+#define STEPCONTEXT_H_
+
+#include "sfctypes.h"
 
 namespace sfc {
 
-Step::Step() : StatefulObject() {
-	this->entry_point = false;
-}
-
-Step::Step(bool entry_point) : StatefulObject() {
-	this->entry_point = entry_point;
-}
-
-bool Step::isEntryPoint() const {
-	return entry_point;
-}
-
-void Step::setEntryPoint(bool entryPoint) {
-	entry_point = entryPoint;
-}
-
-Step::~Step() {
-}
+class StepContext {
+public:
+	virtual size_t getStepCount() = 0;
+	virtual bool isEntryPoint(const int & id) = 0;
+	virtual const stateful_state_t & getStepState(const int & id) = 0;
+	virtual void toggleStepState(const int & id, const bool & active) = 0;
+};
 
 } /* namespace sfc */
+
+#endif /* STEPCONTEXT_H_ */

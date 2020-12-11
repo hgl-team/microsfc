@@ -13,27 +13,30 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "Step.h"
+#ifndef TRANSITION_H_
+#define TRANSITION_H_
+
+#include "sfctypes.h"
+#include "EventListener.h"
+
+#include "StepContext.h"
 
 namespace sfc {
 
-Step::Step() : StatefulObject() {
-	this->entry_point = false;
-}
-
-Step::Step(bool entry_point) : StatefulObject() {
-	this->entry_point = entry_point;
-}
-
-bool Step::isEntryPoint() const {
-	return entry_point;
-}
-
-void Step::setEntryPoint(bool entryPoint) {
-	entry_point = entryPoint;
-}
-
-Step::~Step() {
-}
+class Transition {
+private:
+	array<int> input_step_ids;
+	array<int> output_step_ids;
+	predicate_fnc condition;
+public:
+	Transition();
+	Transition(const array<int> &input_step_ids,
+			const array<int> &output_step_ids, 
+			predicate_fnc condition);
+	virtual ~Transition();
+	virtual void onActivationChanged(StepContext * const& context);
+};
 
 } /* namespace sfc */
+
+#endif /* TRANSITION_H_ */

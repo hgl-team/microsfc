@@ -8,8 +8,8 @@
 #ifndef TEST_STUBS_H_
 #define TEST_STUBS_H_
 
-#include "../src/sfctypes.h"
-#include "../src/time/Timer.h"
+#include "sfctypes.h"
+#include "Timer.h"
 
 using namespace sfc;
 

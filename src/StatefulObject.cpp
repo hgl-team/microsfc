@@ -1,13 +1,28 @@
 /*
- * StatefulObject.cpp
- *
- *  Created on: 17/11/2019
- *      Author: leonardo
- */
+Copyright 2020 Jerson Leonardo Huerfano Romero
 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 #include "StatefulObject.h"
 
 namespace sfc {
+
+void stateful_on_tick(stateful_state_t & state, const sfc::time_t & delta) {
+	state.transiting = (state.activated) ^ (state.active);
+	state.active = state.activated;
+	state.active_time = state.active && state.transiting ? 0 : state.active_time;
+	state.active_time += state.active ? delta : 0;
+}
 
 StatefulObject::~StatefulObject() {
 }
@@ -68,12 +83,8 @@ void StatefulObject::reportState(const stateful_state_t &state, EventListener *c
 	listener->onActivationChanged(state);
 }
 
-void StatefulObject::onTick(const sfc::ulong_t &delta) {
-	this->state.transiting = (this->state.activated) ^ (this->state.active);
-	this->state.active = this->state.activated;
-	this->state.active_time =
-			(!(this->state.active) || ACTIVATING(this->state)) ?
-					this->state.active_time : this->state.active_time + delta;
+void StatefulObject::onTick(const sfc::time_t &delta) {
+	stateful_on_tick(this->state, delta);
 	this->reportState(this->state);
 }
 
