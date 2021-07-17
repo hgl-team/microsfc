@@ -18,7 +18,7 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 find_package(Threads REQUIRED)
-find_package(GTest REQUIRED)
+# find_package(GTest REQUIRED)
 
 include_directories(include ${GTEST_INCLUDE_DIRS} ${GMOCK_INCLUDE_DIRS})
 file(GLOB SOURCES "src/*.cpp")
