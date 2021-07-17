@@ -41,16 +41,23 @@ void Application::evaluateStates(const sfc::time_t &delta) {
 	this->component_delta = delta;
 
 	if(PTR_ACTIVATING(this->getState())) {
-		for(size_t i = 0; i < this->getStepCount(); i++) {
+		ARRAY_FOREACH(size_t, i, this->getContext()->steps) {
 			if(this->isEntryPoint(i)) {
-				this->toggleStepState(i, true);
+				ARRAY_GET(this->getContext()->steps, i)->activate();
 			}
 		}
 	} else if(PTR_DEACTIVATING(this->getState())) {
-		for(size_t i = 0; i < this->getStepCount(); i++) {
-			this->toggleStepState(i, false);
+		// Shutdown steps
+		ARRAY_FOREACH(size_t, i, this->getContext()->steps) {
+			ARRAY_GET(this->getContext()->steps, i)->shutdown();
 		}
-	} else if(PTR_ACTIVATED(this->getState())) {
+		// Shutdown actions
+		ARRAY_FOREACH(size_t, i, this->getContext()->actions) {
+			(*ARRAY_GET(this->getContext()->actions, i))->shutdown();
+		}
+	} 
+	
+	if(this->getState()->active) {
 		this->evaluateTransitions();
 		this->evaluateActions();
 	}
