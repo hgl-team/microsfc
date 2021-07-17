@@ -73,3 +73,16 @@ TEST_F(StatefulObjectTest, deactivatedObjectNotTransitingAfterTick) {
 	ASSERT_FALSE(stateful_obj.getState()->active);
 	ASSERT_FALSE(PTR_DEACTIVATING(stateful_obj.getState()));
 }
+
+TEST_F(StatefulObjectTest, clearingStatefulObject) {
+	stateful_obj.getState()->active = true;
+	stateful_obj.getState()->active_time = 1;
+	stateful_obj.getState()->transiting = false;
+
+	stateful_obj.clear();
+
+	EXPECT_EQ(stateful_obj.getState()->active_time, 0);
+	ASSERT_FALSE(stateful_obj.getState()->activated);
+	ASSERT_FALSE(stateful_obj.getState()->active);
+	ASSERT_FALSE(stateful_obj.getState()->transiting);
+}

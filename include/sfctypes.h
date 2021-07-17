@@ -16,7 +16,7 @@ limitations under the License.
 #ifndef SFCTYPES_H_
 #define SFCTYPES_H_
 
-#include <cstddef>
+#include <stddef.h>
 #include <cstdint>
 #include <climits>
 
@@ -31,6 +31,8 @@ limitations under the License.
 #define PTR_DEACTIVATING(state) (!((state)->active) && ((state)->transiting))
 #define PTR_DEACTIVATED(state) ((state)->active)
 
+#define ARRAY(t, n, ...) {(t[]){ __VA_ARGS__ }, n}
+#define ARRAY_FOREACH(index_type, index_name, array) for(index_type index_name = 0; index_name < (array).size; index_name++)
 #define ARRAY_GET(a,i) ((a).ptr + (i)) 
 
 #define ACTION_STATE_ACTIVATING 'A'

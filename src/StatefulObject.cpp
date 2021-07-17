@@ -99,6 +99,10 @@ void StatefulObject::shutdown() {
 	this->state.activated = false;
 }
 
+void StatefulObject::clear() {
+	this->state = { 0, false, false, false };
+}
+
 void StatefulObject::stateReported(const stateful_state_t &state) {
 }
 

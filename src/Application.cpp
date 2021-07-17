@@ -93,6 +93,19 @@ void Application::onTick(const sfc::time_t &delta) {
 	}
 }
 
+void Application::clear() {
+	StatefulObject::clear();
+	this->evaluate = false;
+	this->component_delta = 0;
+
+	ARRAY_FOREACH(size_t, i, this->container_context.steps) {
+		ARRAY_GET(this->container_context.steps, i)->clear();
+	}
+	ARRAY_FOREACH(size_t, i, this->container_context.actions) {
+		this->container_context.actions.ptr[i]->clear();
+	}
+}
+
 const sfc::stateful_state_t& Application::getStepState(const int &id) {
 	return *(ARRAY_GET(this->container_context.steps, id)->getState());
 }

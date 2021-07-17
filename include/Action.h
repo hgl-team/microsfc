@@ -39,6 +39,7 @@ public:
 
 	virtual void evaluate(StepContext * const& context);
 	virtual void onTick(const sfc::time_t &delta);
+	virtual void clear();
 
 	const stateful_state_t & getConditionState();
 	size_t getStepId();

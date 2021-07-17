@@ -40,6 +40,11 @@ StoredAction::StoredAction(const size_t &step_id, activation_predicate_fnc condi
 StoredAction::~StoredAction() {
 }
 
+void StoredAction::clear() {
+	Action::clear();
+	this->should_activate = false;
+}
+
 bool StoredAction::evaluateActivation(const sfc::predicate_state_t &state) {
 	if(state.action_state.activated) {
 		this->should_activate = false;

@@ -9,3 +9,4 @@ build/
 *.gcda
 *.gcov
 converage.xml
+Testing/
