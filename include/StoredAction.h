@@ -31,6 +31,8 @@ public:
 	StoredAction(const size_t &step_id, activation_predicate_fnc condition, array<state_handler_t> handlers);
 	virtual ~StoredAction();
 
+	virtual void clear();
+
 protected:
 	virtual bool evaluateActivation(const sfc::predicate_state_t &state) override;
 };

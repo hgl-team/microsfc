@@ -81,6 +81,11 @@ void Action::onTick(const sfc::time_t &delta) {
 	stateful_on_tick(this->condition_state, delta);
 }
 
+void Action::clear() {
+	StatefulObject::clear();
+	this->condition_state = { 0, false, false, false };
+}
+
 const stateful_state_t & Action::getConditionState() {
 	return this->condition_state;
 }

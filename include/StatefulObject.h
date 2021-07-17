@@ -42,6 +42,7 @@ public:
 	virtual void onTick(const sfc::time_t &delta);
 	virtual void activate();
 	virtual void shutdown();
+	virtual void clear();
 
 	const array<EventListener*>& getListeners() const;
 	void setListeners(const array<EventListener*> &listeners);

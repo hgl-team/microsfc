@@ -53,6 +53,7 @@ public:
 	virtual bool isEntryPoint(const int &id);
 	virtual void toggleStepState(const int &id, const bool &active);
 	virtual void onTick(const sfc::time_t &delta);
+	virtual void clear();
 	
 	virtual component_context_t * const getContext();
 };

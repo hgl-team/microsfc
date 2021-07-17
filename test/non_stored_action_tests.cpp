@@ -147,3 +147,35 @@ TEST_F(NonStoredActionTest, actionActivatesAfterConditionSet) {
 	ASSERT_TRUE(reported_state.transiting);
 }
 
+TEST_F(NonStoredActionTest, clearAction) {
+	this->givenAnActionWith5TickCondition();
+
+	EXPECT_CALL(container, getStepState(_)).Times(testing::AtLeast(1))
+		.WillOnce(testing::ReturnRefOfCopy(activatedState))
+		.WillOnce(testing::ReturnRefOfCopy(activatingState))
+		.WillRepeatedly(testing::ReturnRefOfCopy(activeState));
+
+	for (int i = 0; i < 4; i++) {
+		action.evaluate(&container);
+		action.onTick(1); //, &container);
+
+		ASSERT_FALSE(reported_state.active);
+		ASSERT_FALSE(reported_state.transiting);
+	}
+
+	action.evaluate(&container);
+	action.onTick(1); //, &container);
+
+	ASSERT_TRUE(reported_state.active);
+	ASSERT_TRUE(reported_state.transiting);
+
+	ASSERT_TRUE(action.getConditionState().active);
+	ASSERT_TRUE(action.getConditionState().activated);
+	EXPECT_NE(action.getConditionState().active_time, 0);
+
+	action.clear();
+
+	ASSERT_FALSE(action.getConditionState().active);
+	ASSERT_FALSE(action.getConditionState().activated);
+	EXPECT_EQ(action.getConditionState().active_time, 0);
+}
