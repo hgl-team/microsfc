@@ -41,6 +41,7 @@ public:
 	virtual void reset();
 	virtual void disable();
 	virtual timer_state_t * getState();
+	virtual sfc::time_t * getPeriod();
 	virtual void setInterruptCallback(timer_interrupt_callback_t interrupt_callback);
 };
 

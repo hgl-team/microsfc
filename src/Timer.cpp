@@ -85,9 +85,12 @@ timer_state_t * Timer::getState() {
 	return &(this->timer_state);
 }
 
+sfc::time_t * Timer::getPeriod() {
+	return &(this->period);
+}
+
 void Timer::setInterruptCallback(timer_interrupt_callback_t interrupt_callback) {
 	this->interrupt_callback = interrupt_callback;
 }
 
 } /* namespace sfc */
-
