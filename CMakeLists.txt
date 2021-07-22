@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(microsfc VERSION 1.2.1)
+project(microsfc VERSION 1.2.2.0)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
